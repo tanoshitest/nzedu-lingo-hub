@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search } from 'lucide-react';
+import { Plus, Search, MoreHorizontal, Pencil, Lock, Unlock, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -7,6 +7,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { toast } from 'sonner';
@@ -23,6 +25,8 @@ const AdminUsers = () => {
   const [users, setUsers] = useState<User[]>(mockUsers);
   const [search, setSearch] = useState('');
   const [open, setOpen] = useState(false);
+  const [editing, setEditing] = useState<User | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<User | null>(null);
   const [form, setForm] = useState({ name: '', email: '', role: 'Học viên' });
 
   const filtered = users.filter(
@@ -45,6 +49,35 @@ const AdminUsers = () => {
     setForm({ name: '', email: '', role: 'Học viên' });
     setOpen(false);
     toast.success('Đã thêm người dùng mới');
+  };
+
+  const startEdit = (u: User) => {
+    setEditing(u);
+    setForm({ name: u.name, email: u.email, role: u.role });
+  };
+
+  const handleSaveEdit = () => {
+    if (!editing) return;
+    if (!form.name || !form.email) {
+      toast.error('Vui lòng điền đầy đủ thông tin');
+      return;
+    }
+    setUsers(users.map((u) => u.id === editing.id ? { ...u, name: form.name, email: form.email, role: form.role as User['role'] } : u));
+    toast.success('Đã cập nhật thông tin');
+    setEditing(null);
+  };
+
+  const toggleLock = (u: User) => {
+    const next = u.status === 'Hoạt động' ? 'Đã khóa' : 'Hoạt động';
+    setUsers(users.map((x) => x.id === u.id ? { ...x, status: next } : x));
+    toast.success(next === 'Đã khóa' ? `Đã khóa tài khoản ${u.name}` : `Đã mở khóa tài khoản ${u.name}`);
+  };
+
+  const handleDelete = () => {
+    if (!confirmDelete) return;
+    setUsers(users.filter((u) => u.id !== confirmDelete.id));
+    toast.success(`Đã xóa ${confirmDelete.name}`);
+    setConfirmDelete(null);
   };
 
   return (
@@ -140,7 +173,27 @@ const AdminUsers = () => {
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
-                      <Button variant="ghost" size="sm">Sửa</Button>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" size="icon" className="h-8 w-8">
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => startEdit(u)} className="gap-2">
+                            <Pencil className="h-4 w-4" /> Sửa
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toggleLock(u)} className="gap-2">
+                            {u.status === 'Hoạt động'
+                              ? <><Lock className="h-4 w-4" /> Khóa tài khoản</>
+                              : <><Unlock className="h-4 w-4" /> Mở khóa</>}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => setConfirmDelete(u)} className="gap-2 text-destructive focus:text-destructive">
+                            <Trash2 className="h-4 w-4" /> Xóa
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                   </TableRow>
                 );
@@ -156,6 +209,58 @@ const AdminUsers = () => {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Edit dialog */}
+      <Dialog open={!!editing} onOpenChange={(o) => !o && setEditing(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Sửa người dùng</DialogTitle>
+            <DialogDescription>Cập nhật thông tin {editing?.name}</DialogDescription>
+          </DialogHeader>
+          <div className="space-y-4 py-2">
+            <div className="space-y-2">
+              <Label>Họ và tên</Label>
+              <Input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Email</Label>
+              <Input type="email" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} />
+            </div>
+            <div className="space-y-2">
+              <Label>Vai trò</Label>
+              <Select value={form.role} onValueChange={(v) => setForm({ ...form, role: v })}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="Quản trị viên">Quản trị viên</SelectItem>
+                  <SelectItem value="Giáo vụ">Giáo vụ</SelectItem>
+                  <SelectItem value="Giáo viên">Giáo viên</SelectItem>
+                  <SelectItem value="Học viên">Học viên</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setEditing(null)}>Hủy</Button>
+            <Button onClick={handleSaveEdit} className="gradient-hero">Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete confirm */}
+      <AlertDialog open={!!confirmDelete} onOpenChange={(o) => !o && setConfirmDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Xóa người dùng?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Hành động này không thể hoàn tác. Tài khoản <strong>{confirmDelete?.name}</strong> ({confirmDelete?.email}) sẽ bị xóa khỏi hệ thống.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Hủy</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Xóa</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

@@ -1,7 +1,31 @@
-import { Calendar, Clock, BookOpen, MapPin, Sparkles } from 'lucide-react';
+import { Calendar, Clock, BookOpen, MapPin, Sparkles, CheckCircle2, XCircle, MessageSquare, History } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+
+interface AttendanceEntry {
+  date: string;
+  className: string;
+  attendance: 'Có mặt' | 'Vắng' | 'Vắng có phép';
+  topic: string;
+  teacherComment: string;
+  hwScore?: number;
+}
+
+const attendanceTimeline: AttendanceEntry[] = [
+  { date: '17/04/2026', className: 'IELTS 6.5 - A1', attendance: 'Có mặt', topic: 'Writing Task 2 - Opinion Essay', teacherComment: 'Phát âm tốt, cần luyện thêm từ vựng học thuật.', hwScore: 8.5 },
+  { date: '15/04/2026', className: 'IELTS 6.5 - A1', attendance: 'Có mặt', topic: 'Reading Test Cambridge 17', teacherComment: 'Bài viết Task 2 có cấu trúc rõ ràng.', hwScore: 8.0 },
+  { date: '12/04/2026', className: 'IELTS 6.5 - A1', attendance: 'Vắng có phép', topic: 'Listening Practice', teacherComment: 'Vắng có phép, cần xem lại bài giảng online.' },
+  { date: '10/04/2026', className: 'IELTS 6.5 - A1', attendance: 'Có mặt', topic: 'Speaking Part 2', teacherComment: 'Xuất sắc, phần Speaking rất tự nhiên.', hwScore: 9.0 },
+  { date: '08/04/2026', className: 'IELTS 6.5 - A1', attendance: 'Có mặt', topic: 'Vocabulary Building - Environment', teacherComment: 'Tham gia tích cực, ghi chú đầy đủ.', hwScore: 8.0 },
+  { date: '05/04/2026', className: 'IELTS 6.5 - A1', attendance: 'Vắng', topic: 'Grammar - Conditionals', teacherComment: 'Vắng không phép, vui lòng liên hệ giáo vụ.' },
+];
+
+const attendanceColors: Record<string, string> = {
+  'Có mặt': 'bg-success/10 text-success border-success/20',
+  'Vắng có phép': 'bg-warning/10 text-warning border-warning/20',
+  'Vắng': 'bg-destructive/10 text-destructive border-destructive/20',
+};
 
 const StudentDashboard = () => (
   <div className="space-y-6">
@@ -92,6 +116,54 @@ const StudentDashboard = () => (
         </CardContent>
       </Card>
     </div>
+
+    {/* Lộ trình học tập — timeline */}
+    <Card className="border-border/60">
+      <CardHeader>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div>
+            <CardTitle className="font-display text-base flex items-center gap-2"><History className="h-4 w-4" /> Lộ trình học tập</CardTitle>
+            <p className="text-sm text-muted-foreground mt-0.5">Lịch sử điểm danh và nhận xét của giáo viên</p>
+          </div>
+          <Button variant="outline" size="sm">Xem toàn bộ</Button>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="relative space-y-5">
+          {/* Vertical line */}
+          <div className="absolute left-[15px] top-2 bottom-2 w-px bg-border" aria-hidden="true" />
+          {attendanceTimeline.map((a, i) => {
+            const isPresent = a.attendance === 'Có mặt';
+            const Icon = isPresent ? CheckCircle2 : XCircle;
+            return (
+              <div key={i} className="relative flex gap-4">
+                <div className={`h-8 w-8 rounded-full flex items-center justify-center flex-shrink-0 ring-4 ring-background ${
+                  isPresent ? 'bg-success text-success-foreground' : a.attendance === 'Vắng có phép' ? 'bg-warning text-warning-foreground' : 'bg-destructive text-destructive-foreground'
+                }`}>
+                  <Icon className="h-4 w-4" />
+                </div>
+                <div className="flex-1 pb-2 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <div className="font-semibold text-sm">{a.topic}</div>
+                    <Badge variant="outline" className={attendanceColors[a.attendance]}>{a.attendance}</Badge>
+                    {a.hwScore != null && <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">HW: {a.hwScore}</Badge>}
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-0.5 flex items-center gap-2 flex-wrap">
+                    <span>{a.date}</span>
+                    <span>•</span>
+                    <span>{a.className}</span>
+                  </div>
+                  <div className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
+                    <MessageSquare className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+                    <span className="italic">"{a.teacherComment}"</span>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </CardContent>
+    </Card>
   </div>
 );
 

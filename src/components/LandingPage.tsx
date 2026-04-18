@@ -1,8 +1,15 @@
-import { GraduationCap, Sparkles, Users, BookOpen, TrendingUp, Globe } from 'lucide-react';
+import { GraduationCap, Sparkles, Users, BookOpen, TrendingUp, Globe, Mail, MapPin, Phone, Facebook, Youtube, Instagram } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { motion } from 'framer-motion';
 import type { Role } from '@/data/mockData';
+import StatsBar from './landing/StatsBar';
+import CoursesSection from './landing/CoursesSection';
+import WhyUsSection from './landing/WhyUsSection';
+import TeachersSection from './landing/TeachersSection';
+import TestimonialsSection from './landing/TestimonialsSection';
+import FaqSection from './landing/FaqSection';
+import CtaSection from './landing/CtaSection';
 
 interface LandingPageProps {
   onLogin: (role: Role) => void;
@@ -179,9 +186,27 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
         </div>
       </section>
 
-      {/* Features */}
+      {/* Stats Bar */}
+      <StatsBar />
+
+      {/* Courses */}
+      <CoursesSection />
+
+      {/* Why us */}
+      <WhyUsSection />
+
+      {/* Teachers */}
+      <TeachersSection />
+
+      {/* Testimonials */}
+      <TestimonialsSection />
+
+      {/* Platform features for management */}
       <section className="container py-20">
         <div className="text-center max-w-2xl mx-auto mb-12">
+          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5 text-sm shadow-sm mb-4">
+            <span className="text-primary font-medium">Nền tảng quản lý</span>
+          </div>
           <h2 className="font-display text-3xl md:text-4xl font-bold mb-4">Mọi thứ bạn cần để vận hành</h2>
           <p className="text-muted-foreground text-lg">Một nền tảng duy nhất cho mọi vai trò trong trung tâm</p>
         </div>
@@ -206,9 +231,81 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
         </div>
       </section>
 
-      <footer className="border-t border-border py-8">
-        <div className="container text-center text-sm text-muted-foreground">
-          © 2026 NZedu LMS. Hệ thống quản lý trung tâm Anh ngữ.
+      {/* FAQ */}
+      <FaqSection />
+
+      {/* CTA */}
+      <CtaSection onLogin={onLogin} />
+
+      {/* Footer */}
+      <footer className="border-t border-border bg-card">
+        <div className="container py-12">
+          <div className="grid gap-10 md:grid-cols-4">
+            <div className="md:col-span-1">
+              <div className="flex items-center gap-2 mb-4">
+                <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero shadow-glow">
+                  <GraduationCap className="h-5 w-5 text-primary-foreground" />
+                </div>
+                <span className="font-display text-xl font-bold">NZedu LMS</span>
+              </div>
+              <p className="text-sm text-muted-foreground mb-4">
+                Hệ sinh thái học tập tiếng Anh toàn diện cho mọi lứa tuổi.
+              </p>
+              <div className="flex gap-3">
+                <a href="#" className="h-9 w-9 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors">
+                  <Facebook className="h-4 w-4" />
+                </a>
+                <a href="#" className="h-9 w-9 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors">
+                  <Youtube className="h-4 w-4" />
+                </a>
+                <a href="#" className="h-9 w-9 rounded-lg bg-muted hover:bg-primary hover:text-primary-foreground flex items-center justify-center transition-colors">
+                  <Instagram className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
+
+            <div>
+              <h4 className="font-display font-bold mb-4">Khóa học</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#courses" className="hover:text-primary">Luyện thi IELTS</a></li>
+                <li><a href="#courses" className="hover:text-primary">Luyện thi TOEIC</a></li>
+                <li><a href="#courses" className="hover:text-primary">Tiếng Anh giao tiếp</a></li>
+                <li><a href="#courses" className="hover:text-primary">Tiếng Anh trẻ em</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-display font-bold mb-4">Về NZedu</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li><a href="#" className="hover:text-primary">Giới thiệu</a></li>
+                <li><a href="#" className="hover:text-primary">Đội ngũ giáo viên</a></li>
+                <li><a href="#" className="hover:text-primary">Tin tức & Blog</a></li>
+                <li><a href="#faq" className="hover:text-primary">Câu hỏi thường gặp</a></li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 className="font-display font-bold mb-4">Liên hệ</h4>
+              <ul className="space-y-3 text-sm text-muted-foreground">
+                <li className="flex items-start gap-2">
+                  <MapPin className="h-4 w-4 mt-0.5 text-primary flex-shrink-0" />
+                  <span>123 Nguyễn Văn Linh, Q.7, TP.HCM</span>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Phone className="h-4 w-4 text-primary flex-shrink-0" />
+                  <a href="tel:19006868" className="hover:text-primary">1900 6868</a>
+                </li>
+                <li className="flex items-center gap-2">
+                  <Mail className="h-4 w-4 text-primary flex-shrink-0" />
+                  <a href="mailto:hello@nzedu.vn" className="hover:text-primary">hello@nzedu.vn</a>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="border-t border-border mt-10 pt-6 text-center text-sm text-muted-foreground">
+            © 2026 NZedu LMS. Hệ thống quản lý trung tâm Anh ngữ. Mọi quyền được bảo lưu.
+          </div>
         </div>
       </footer>
     </div>

@@ -133,28 +133,16 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
         })}
       </nav>
 
-      <div className="border-t border-sidebar-border p-4">
-        <div className="flex items-center gap-3 rounded-lg bg-sidebar-accent/50 p-3">
-          <Avatar className="h-9 w-9">
-            <AvatarFallback className="bg-sidebar-primary text-sidebar-primary-foreground text-xs">
-              {initials}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1 min-w-0">
-            <div className="text-sm font-medium text-sidebar-primary-foreground truncate">{userName}</div>
-            <div className="text-xs text-sidebar-foreground/70 truncate">{roleLabels[role]}</div>
-          </div>
-        </div>
-      </div>
     </div>
   );
 
   return (
     <div className="flex min-h-screen w-full bg-background">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-shrink-0 border-r border-sidebar-border">
+      <aside className="hidden lg:flex w-64 flex-shrink-0 border-r border-sidebar-border fixed inset-y-0 left-0 z-30">
         <SidebarContent />
       </aside>
+      <div className="hidden lg:block w-64 flex-shrink-0" aria-hidden="true" />
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, FolderOpen, GanttChart, Award } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, FolderOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Trophy, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -18,6 +18,20 @@ import TeacherMaterials from './views/TeacherMaterials';
 import StudentDashboard from './views/StudentDashboard';
 import StudentSchedule from './views/StudentSchedule';
 import StudentResults from './views/StudentResults';
+import AdminTasks from './views/AdminTasks';
+import CoordinatorTasks from './views/CoordinatorTasks';
+import TeacherTasks from './views/TeacherTasks';
+import StudentSubmissions from './views/StudentSubmissions';
+import CoordinatorGrading from './views/CoordinatorGrading';
+import TeacherGrading from './views/TeacherGrading';
+import AdminFinance from './views/AdminFinance';
+import AdminCourses from './views/AdminCourses';
+import CoordinatorAdmissions from './views/CoordinatorAdmissions';
+import CoordinatorRenewals from './views/CoordinatorRenewals';
+import StudentTuition from './views/StudentTuition';
+import TeacherMonthlyResults from './views/TeacherMonthlyResults';
+import TeacherPayroll from './views/TeacherPayroll';
+import CoordinatorOffice from './views/CoordinatorOffice';
 
 interface AppShellProps {
   role: Role;
@@ -34,21 +48,35 @@ const menus: Record<Role, MenuItem[]> = {
   Admin: [
     { key: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'users', label: 'Quản lý người dùng', icon: Users },
+    { key: 'courses', label: 'Danh mục đào tạo', icon: Library },
+    { key: 'finance', label: 'Phê duyệt tài chính', icon: Wallet },
+    { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],
   Coordinator: [
     { key: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard },
+    { key: 'admissions', label: 'Tuyển sinh', icon: UserPlus },
     { key: 'schedule', label: 'Quản lý lịch học', icon: Calendar },
     { key: 'reports', label: 'Duyệt báo cáo', icon: FileCheck },
+    { key: 'grading', label: 'Điều phối chấm bài', icon: Inbox },
+    { key: 'renewals', label: 'Gia hạn & Công nợ', icon: RefreshCw },
+    { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
+    { key: 'office', label: 'Công tác văn phòng', icon: Building2 },
   ],
   Teacher: [
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
     { key: 'report', label: 'Báo cáo lớp học', icon: BookOpen },
+    { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
+    { key: 'monthly', label: 'Kết quả định kỳ', icon: Trophy },
     { key: 'materials', label: 'Tài liệu', icon: FolderOpen },
+    { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
+    { key: 'payroll', label: 'Bảng công', icon: Wallet },
   ],
   Student: [
     { key: 'dashboard', label: 'Bảng điều khiển', icon: GanttChart },
     { key: 'schedule', label: 'Lịch học', icon: Calendar },
+    { key: 'submissions', label: 'Bài tập & Nộp bài', icon: Upload },
     { key: 'results', label: 'Kết quả học tập', icon: Award },
+    { key: 'tuition', label: 'Học phí & Gia hạn', icon: Receipt },
   ],
 };
 
@@ -68,18 +96,37 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
   const userName = userNames[role];
   const initials = userName.split(' ').slice(-2).map((s) => s[0]).join('');
 
+  const viewMap: Record<string, JSX.Element> = {
+    'Admin-dashboard': <AdminDashboard />,
+    'Admin-users': <AdminUsers />,
+    'Admin-courses': <AdminCourses />,
+    'Admin-finance': <AdminFinance />,
+    'Admin-tasks': <AdminTasks />,
+    'Coordinator-dashboard': <CoordinatorDashboard />,
+    'Coordinator-admissions': <CoordinatorAdmissions />,
+    'Coordinator-schedule': <CoordinatorSchedule />,
+    'Coordinator-reports': <CoordinatorReports />,
+    'Coordinator-grading': <CoordinatorGrading />,
+    'Coordinator-renewals': <CoordinatorRenewals />,
+    'Coordinator-tasks': <CoordinatorTasks />,
+    'Coordinator-office': <CoordinatorOffice />,
+    'Teacher-schedule': <TeacherSchedule />,
+    'Teacher-report': <TeacherReport />,
+    'Teacher-grading': <TeacherGrading />,
+    'Teacher-monthly': <TeacherMonthlyResults />,
+    'Teacher-materials': <TeacherMaterials />,
+    'Teacher-tasks': <TeacherTasks />,
+    'Teacher-payroll': <TeacherPayroll />,
+    'Student-dashboard': <StudentDashboard />,
+    'Student-schedule': <StudentSchedule />,
+    'Student-submissions': <StudentSubmissions />,
+    'Student-results': <StudentResults />,
+    'Student-tuition': <StudentTuition />,
+  };
+
   const renderView = () => {
     const key = `${role}-${activeMenu}`;
-    let content;
-    if (role === 'Admin') {
-      content = activeMenu === 'dashboard' ? <AdminDashboard /> : <AdminUsers />;
-    } else if (role === 'Coordinator') {
-      content = activeMenu === 'dashboard' ? <CoordinatorDashboard /> : activeMenu === 'schedule' ? <CoordinatorSchedule /> : <CoordinatorReports />;
-    } else if (role === 'Teacher') {
-      content = activeMenu === 'schedule' ? <TeacherSchedule /> : activeMenu === 'report' ? <TeacherReport /> : <TeacherMaterials />;
-    } else {
-      content = activeMenu === 'dashboard' ? <StudentDashboard /> : activeMenu === 'schedule' ? <StudentSchedule /> : <StudentResults />;
-    }
+    const content = viewMap[key] ?? <div className="text-muted-foreground">Chức năng đang được phát triển.</div>;
     return (
       <motion.div
         key={key}

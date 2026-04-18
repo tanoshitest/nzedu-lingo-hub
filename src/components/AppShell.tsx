@@ -94,7 +94,7 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
   };
 
   const SidebarContent = ({ onItemClick }: { onItemClick?: () => void }) => (
-    <div className="flex h-full flex-col bg-sidebar text-sidebar-foreground">
+    <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
       <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-6">
         <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
           <GraduationCap className="h-5 w-5 text-primary-foreground" />

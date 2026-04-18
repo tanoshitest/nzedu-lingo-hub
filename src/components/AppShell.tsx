@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, FolderOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Trophy, Building2 } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, FolderOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Trophy, Building2, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -32,6 +32,7 @@ import StudentTuition from './views/StudentTuition';
 import TeacherMonthlyResults from './views/TeacherMonthlyResults';
 import TeacherPayroll from './views/TeacherPayroll';
 import CoordinatorOffice from './views/CoordinatorOffice';
+import AdminReports from './views/AdminReports';
 
 interface AppShellProps {
   role: Role;
@@ -50,6 +51,7 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'users', label: 'Quản lý người dùng', icon: Users },
     { key: 'courses', label: 'Danh mục đào tạo', icon: Library },
     { key: 'finance', label: 'Phê duyệt tài chính', icon: Wallet },
+    { key: 'reports', label: 'Báo cáo', icon: BarChart3 },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],
   Coordinator: [
@@ -101,6 +103,7 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Admin-users': <AdminUsers />,
     'Admin-courses': <AdminCourses />,
     'Admin-finance': <AdminFinance />,
+    'Admin-reports': <AdminReports />,
     'Admin-tasks': <AdminTasks />,
     'Coordinator-dashboard': <CoordinatorDashboard />,
     'Coordinator-admissions': <CoordinatorAdmissions />,

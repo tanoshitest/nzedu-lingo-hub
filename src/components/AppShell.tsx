@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, FolderOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Trophy, Building2, BarChart3 } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, FolderOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Trophy, Building2, BarChart3, FileEdit, FileText, Database, ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -33,6 +33,13 @@ import TeacherMonthlyResults from './views/TeacherMonthlyResults';
 import TeacherPayroll from './views/TeacherPayroll';
 import CoordinatorOffice from './views/CoordinatorOffice';
 import AdminReports from './views/AdminReports';
+import AdminIeltsTests from './views/AdminIeltsTests';
+import AdminQuestionBank from './views/AdminQuestionBank';
+import TeacherIeltsTests from './views/TeacherIeltsTests';
+import CoordinatorIeltsTests from './views/CoordinatorIeltsTests';
+import CoordinatorTestAssignments from './views/CoordinatorTestAssignments';
+import TeacherTestGrading from './views/TeacherTestGrading';
+import StudentTests from './views/StudentTests';
 
 interface AppShellProps {
   role: Role;
@@ -50,6 +57,8 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'users', label: 'Quản lý người dùng', icon: Users },
     { key: 'courses', label: 'Danh mục đào tạo', icon: Library },
+    { key: 'ielts', label: 'Thiết kế đề thi', icon: FileEdit },
+    { key: 'bank', label: 'Ngân hàng câu hỏi', icon: Database },
     { key: 'finance', label: 'Phê duyệt tài chính', icon: Wallet },
     { key: 'reports', label: 'Báo cáo', icon: BarChart3 },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
@@ -60,23 +69,28 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'schedule', label: 'Quản lý lịch học', icon: Calendar },
     { key: 'reports', label: 'Duyệt báo cáo', icon: FileCheck },
     { key: 'grading', label: 'Điều phối chấm bài', icon: Inbox },
+    { key: 'test-assign', label: 'Giao & Duyệt bài thi', icon: ClipboardCheck },
     { key: 'renewals', label: 'Gia hạn & Công nợ', icon: RefreshCw },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
     { key: 'office', label: 'Công tác văn phòng', icon: Building2 },
+    { key: 'ielts', label: 'Đề thi IELTS', icon: FileText },
   ],
   Teacher: [
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
     { key: 'report', label: 'Báo cáo lớp học', icon: BookOpen },
     { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
+    { key: 'test-assign', label: 'Giao & Chấm bài thi', icon: ClipboardCheck },
     { key: 'monthly', label: 'Kết quả định kỳ', icon: Trophy },
     { key: 'materials', label: 'Tài liệu', icon: FolderOpen },
     { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
     { key: 'payroll', label: 'Bảng công', icon: Wallet },
+    { key: 'ielts', label: 'Đề thi IELTS', icon: FileText },
   ],
   Student: [
     { key: 'dashboard', label: 'Bảng điều khiển', icon: GanttChart },
     { key: 'schedule', label: 'Lịch học', icon: Calendar },
     { key: 'submissions', label: 'Bài tập & Nộp bài', icon: Upload },
+    { key: 'tests', label: 'Bài thi IELTS', icon: FileText },
     { key: 'results', label: 'Kết quả học tập', icon: Award },
     { key: 'tuition', label: 'Học phí & Gia hạn', icon: Receipt },
   ],
@@ -104,6 +118,8 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Admin-courses': <AdminCourses />,
     'Admin-finance': <AdminFinance />,
     'Admin-reports': <AdminReports />,
+    'Admin-ielts': <AdminIeltsTests />,
+    'Admin-bank': <AdminQuestionBank />,
     'Admin-tasks': <AdminTasks />,
     'Coordinator-dashboard': <CoordinatorDashboard />,
     'Coordinator-admissions': <CoordinatorAdmissions />,
@@ -113,6 +129,8 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Coordinator-renewals': <CoordinatorRenewals />,
     'Coordinator-tasks': <CoordinatorTasks />,
     'Coordinator-office': <CoordinatorOffice />,
+    'Coordinator-ielts': <CoordinatorIeltsTests />,
+    'Coordinator-test-assign': <CoordinatorTestAssignments />,
     'Teacher-schedule': <TeacherSchedule />,
     'Teacher-report': <TeacherReport />,
     'Teacher-grading': <TeacherGrading />,
@@ -120,9 +138,12 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Teacher-materials': <TeacherMaterials />,
     'Teacher-tasks': <TeacherTasks />,
     'Teacher-payroll': <TeacherPayroll />,
+    'Teacher-ielts': <TeacherIeltsTests />,
+    'Teacher-test-assign': <TeacherTestGrading />,
     'Student-dashboard': <StudentDashboard />,
     'Student-schedule': <StudentSchedule />,
     'Student-submissions': <StudentSubmissions />,
+    'Student-tests': <StudentTests />,
     'Student-results': <StudentResults />,
     'Student-tuition': <StudentTuition />,
   };

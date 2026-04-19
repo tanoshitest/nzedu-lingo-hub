@@ -72,7 +72,6 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
     { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
     { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
-    { key: 'payroll', label: 'Bảng công', icon: Wallet },
     { key: 'ielts', label: 'Đề thi IELTS', icon: FileText },
   ],
   Student: [

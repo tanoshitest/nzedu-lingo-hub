@@ -40,6 +40,8 @@ import CoordinatorIeltsTests from './views/CoordinatorIeltsTests';
 import CoordinatorTestAssignments from './views/CoordinatorTestAssignments';
 import TeacherTestGrading from './views/TeacherTestGrading';
 import StudentTests from './views/StudentTests';
+import StudentMyCourse from './views/StudentMyCourse';
+import TeacherMyCourse from './views/TeacherMyCourse';
 
 interface AppShellProps {
   role: Role;
@@ -76,6 +78,7 @@ const menus: Record<Role, MenuItem[]> = {
   ],
   Teacher: [
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
+    { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
     { key: 'report', label: 'Báo cáo lớp học', icon: BookOpen },
     { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
     { key: 'test-assign', label: 'Giao & Chấm bài thi', icon: ClipboardCheck },
@@ -87,6 +90,7 @@ const menus: Record<Role, MenuItem[]> = {
   ],
   Student: [
     { key: 'dashboard', label: 'Bảng điều khiển', icon: GanttChart },
+    { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
     { key: 'schedule', label: 'Lịch học', icon: Calendar },
     { key: 'submissions', label: 'Bài tập & Nộp bài', icon: Upload },
     { key: 'tests', label: 'Bài thi IELTS', icon: FileText },
@@ -139,7 +143,9 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Teacher-payroll': <TeacherPayroll />,
     'Teacher-ielts': <TeacherIeltsTests />,
     'Teacher-test-assign': <TeacherTestGrading />,
+    'Teacher-my-course': <TeacherMyCourse />,
     'Student-dashboard': <StudentDashboard />,
+    'Student-my-course': <StudentMyCourse />,
     'Student-schedule': <StudentSchedule />,
     'Student-submissions': <StudentSubmissions />,
     'Student-tests': <StudentTests />,

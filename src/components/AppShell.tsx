@@ -56,7 +56,7 @@ const menus: Record<Role, MenuItem[]> = {
   Admin: [
     { key: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'users', label: 'Quản lý người dùng', icon: Users },
-    { key: 'courses', label: 'Danh mục đào tạo', icon: Library },
+    { key: 'courses', label: 'Thiết kế khoá học', icon: Library },
     { key: 'ielts', label: 'Thiết kế đề thi', icon: FileEdit },
     { key: 'bank', label: 'Ngân hàng câu hỏi', icon: Database },
     { key: 'finance', label: 'Phê duyệt tài chính', icon: Wallet },

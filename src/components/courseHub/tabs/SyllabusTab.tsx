@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -6,15 +5,15 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BookOpen, FileText, Sparkles, ChevronRight, Circle, CheckCircle2, CircleDashed, Clock, Download, Link as LinkIcon } from 'lucide-react';
 import { exerciseScores, sampleDocuments, exerciseStatusLabels, exerciseStatusColors, sampleStatusLabels, sampleStatusColors, skillColors } from '@/data/mockCourseHub';
 import { testAttempts, testAssignments } from '@/data/mockTestAttempts';
-import { useClassReports, reportStore, reportStatusDot } from '@/data/mockClassReports';
+import { useClassReports } from '@/data/mockClassReports';
 import SessionReportForm from '../SessionReportForm';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { TabContext } from '../shared/TabContext';
 
-const SyllabusTab = ({ course, role, studentId, className, teacherName }: TabContext) => {
+const SyllabusTab = ({ course, role, studentId, className, teacherName, selectedSessionOrder, onSelectSession }: TabContext) => {
   const sessions = course.syllabus?.sessions ?? [];
-  const [selectedOrder, setSelectedOrder] = useState<number>(sessions[0]?.order ?? 1);
+  const selectedOrder = selectedSessionOrder ?? sessions[0]?.order ?? 1;
   useClassReports(); // subscribe rerender khi report đổi
 
   const courseEx = exerciseScores.filter((e) => e.courseCode === course.code);
@@ -51,42 +50,6 @@ const SyllabusTab = ({ course, role, studentId, className, teacherName }: TabCon
 
   return (
     <div className="space-y-4">
-      {/* Session selector strip */}
-      <Card className="border-border/60">
-        <CardContent className="p-3">
-          <div className="flex gap-2 overflow-x-auto pb-1">
-            {sessions.map((s) => {
-              const isActive = s.order === selectedOrder;
-              const report = role === 'Teacher' && className
-                ? reportStore.findBySession(course.code, className, s.order)
-                : undefined;
-              return (
-                <button
-                  key={s.id}
-                  onClick={() => setSelectedOrder(s.order)}
-                  className={cn(
-                    'flex-shrink-0 px-3 py-2 rounded-lg border text-xs font-medium transition relative',
-                    isActive ? 'border-primary bg-primary/10 text-primary' : 'border-border hover:bg-muted/50',
-                  )}
-                >
-                  Buổi {s.order}
-                  <div className="text-[10px] opacity-70 truncate max-w-[140px]">{s.title}</div>
-                  {role === 'Teacher' && (
-                    <span
-                      className={cn(
-                        'absolute top-1.5 right-1.5 h-2 w-2 rounded-full',
-                        report ? reportStatusDot[report.status] : 'bg-muted-foreground/30',
-                      )}
-                      title={report ? `Báo cáo: ${report.status}` : 'Chưa có báo cáo'}
-                    />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Session header */}
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>

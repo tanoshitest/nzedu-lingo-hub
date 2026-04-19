@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 import type { Course } from '@/data/mockFinance';
+import { reportStore, useClassReports, reportStatusDot } from '@/data/mockClassReports';
 import CourseSidebarNav, { type CourseTabKey } from './CourseSidebarNav';
 import OverviewTab from './tabs/OverviewTab';
 import SyllabusTab from './tabs/SyllabusTab';
@@ -38,8 +40,23 @@ interface Props {
 
 const CourseDetailLayout = ({ course, role, studentId, className, teacherName, onBack }: Props) => {
   const [active, setActive] = useState<CourseTabKey>('overview');
+  const sessions = course.syllabus?.sessions ?? [];
+  const [selectedSessionOrder, setSelectedSessionOrder] = useState<number>(sessions[0]?.order ?? 1);
+  useClassReports(); // subscribe to refresh status dots
 
-  const ctx = { course, role, studentId, className, teacherName };
+  const ctx = {
+    course,
+    role,
+    studentId,
+    className,
+    teacherName,
+    selectedSessionOrder,
+    onSelectSession: setSelectedSessionOrder,
+  };
+
+  const handleNavChange = (key: CourseTabKey) => {
+    setActive(key);
+  };
 
   const renderTab = () => {
     switch (active) {
@@ -89,7 +106,47 @@ const CourseDetailLayout = ({ course, role, studentId, className, teacherName, o
             </div>
             {teacherName && <div className="text-[11px] text-muted-foreground mt-1">GV: {teacherName}</div>}
           </div>
-          <CourseSidebarNav active={active} onChange={setActive} />
+          <CourseSidebarNav
+            active={active}
+            onChange={handleNavChange}
+            renderAfter={{
+              syllabus: sessions.length > 0 ? (
+                <div className="ml-3 pl-4 border-l border-border/60 space-y-0.5 py-1 max-h-[50vh] overflow-y-auto">
+                  {sessions.map((s) => {
+                    const isActiveSession = s.order === selectedSessionOrder;
+                    const report = role === 'Teacher' && className
+                      ? reportStore.findBySession(course.code, className, s.order)
+                      : undefined;
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => setSelectedSessionOrder(s.order)}
+                        className={cn(
+                          'group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs transition-all text-left',
+                          isActiveSession
+                            ? 'bg-primary/10 text-primary font-medium'
+                            : 'text-muted-foreground hover:bg-muted hover:text-foreground',
+                        )}
+                      >
+                        <ChevronRight className={cn('h-3 w-3 flex-shrink-0 transition-transform', isActiveSession && 'rotate-90 text-primary')} />
+                        <span className="font-mono text-[10px] flex-shrink-0">B{s.order}</span>
+                        <span className="flex-1 min-w-0 truncate">{s.title}</span>
+                        {role === 'Teacher' && (
+                          <span
+                            className={cn(
+                              'h-1.5 w-1.5 rounded-full flex-shrink-0',
+                              report ? reportStatusDot[report.status] : 'bg-muted-foreground/30',
+                            )}
+                            title={report ? `Báo cáo: ${report.status}` : 'Chưa có báo cáo'}
+                          />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              ) : null,
+            }}
+          />
         </aside>
 
         {/* Content */}

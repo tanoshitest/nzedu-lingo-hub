@@ -8,4 +8,6 @@ export interface TabContext {
   studentId?: string;
   className?: string;
   teacherName?: string;
+  selectedSessionOrder?: number;
+  onSelectSession?: (order: number) => void;
 }

@@ -1,3 +1,4 @@
+import { ReactNode } from 'react';
 import { LayoutDashboard, BookOpen, CalendarDays, ClipboardCheck, TrendingUp, FileText, Library, ListChecks, FileStack, Sparkles, Route, History, Trophy, Camera, Award, MessageSquare, Info, Plus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -50,9 +51,10 @@ export const COURSE_NAV: NavGroup[] = [
 interface Props {
   active: CourseTabKey;
   onChange: (key: CourseTabKey) => void;
+  renderAfter?: Partial<Record<CourseTabKey, ReactNode>>;
 }
 
-const CourseSidebarNav = ({ active, onChange }: Props) => (
+const CourseSidebarNav = ({ active, onChange, renderAfter }: Props) => (
   <nav className="space-y-4">
     {COURSE_NAV.map((group, gi) => (
       <div key={gi} className="space-y-1">
@@ -64,23 +66,26 @@ const CourseSidebarNav = ({ active, onChange }: Props) => (
         {group.items.map((item) => {
           const Icon = item.icon;
           const isActive = item.key === active;
+          const extra = renderAfter?.[item.key];
           return (
-            <button
-              key={item.key}
-              onClick={() => onChange(item.key)}
-              className={cn(
-                'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all text-left',
-                isActive
-                  ? 'bg-primary/10 text-primary'
-                  : 'text-foreground/80 hover:bg-muted hover:text-foreground',
-              )}
-            >
-              <Icon className={cn('h-4 w-4 flex-shrink-0', isActive && 'text-primary')} />
-              <div className="flex-1 min-w-0">
-                <div className="truncate">{item.label}</div>
-                {item.hint && <div className="text-[10px] text-muted-foreground truncate">{item.hint}</div>}
-              </div>
-            </button>
+            <div key={item.key}>
+              <button
+                onClick={() => onChange(item.key)}
+                className={cn(
+                  'group flex w-full items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all text-left',
+                  isActive
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-foreground/80 hover:bg-muted hover:text-foreground',
+                )}
+              >
+                <Icon className={cn('h-4 w-4 flex-shrink-0', isActive && 'text-primary')} />
+                <div className="flex-1 min-w-0">
+                  <div className="truncate">{item.label}</div>
+                  {item.hint && <div className="text-[10px] text-muted-foreground truncate">{item.hint}</div>}
+                </div>
+              </button>
+              {isActive && extra && <div className="mt-1">{extra}</div>}
+            </div>
           );
         })}
       </div>

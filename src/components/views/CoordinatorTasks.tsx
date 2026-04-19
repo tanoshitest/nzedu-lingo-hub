@@ -27,7 +27,7 @@ const CoordinatorTasks = () => {
       <div className="grid grid-cols-2 gap-3">
         <Card className="border-border/60">
           <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-xs text-muted-foreground"><Inbox className="h-3.5 w-3.5" /> Việc cần làm</div>
+            <div className="flex items-center gap-2 text-xs text-muted-foreground"><Inbox className="h-3.5 w-3.5" /> Việc của tôi</div>
             <div className="text-2xl font-bold mt-1">{incoming.length}</div>
           </CardContent>
         </Card>
@@ -47,7 +47,7 @@ const CoordinatorTasks = () => {
 
       <Tabs defaultValue="incoming">
         <TabsList>
-          <TabsTrigger value="incoming">Việc cần làm ({incoming.length})</TabsTrigger>
+          <TabsTrigger value="incoming">Việc của tôi ({incoming.length})</TabsTrigger>
           <TabsTrigger value="outgoing">Việc đã giao ({outgoing.length})</TabsTrigger>
         </TabsList>
         <TabsContent value="incoming" className="mt-4">

@@ -66,7 +66,6 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'grading', label: 'Điều phối chấm bài', icon: Inbox },
     { key: 'renewals', label: 'Gia hạn & Công nợ', icon: RefreshCw },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
-    { key: 'office', label: 'Công tác văn phòng', icon: Building2 },
   ],
   Teacher: [
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },

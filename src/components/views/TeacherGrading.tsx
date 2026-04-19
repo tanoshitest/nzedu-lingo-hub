@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { ArrowLeft, FileText, CircleAlert } from 'lucide-react';
+import { ArrowLeft, FileText, CircleAlert, PenSquare, ClipboardList, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -7,17 +7,29 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
+import { Badge } from '@/components/ui/badge';
 import { toast } from 'sonner';
 import SubmissionStatusBadge from '../grading/SubmissionStatusBadge';
+import TestAttemptGradingDialog from '../grading/TestAttemptGradingDialog';
 import { submissions as mockSubmissions, type Submission } from '@/data/mockGrading';
+import {
+  attemptStatusColors,
+  attemptStatusLabels,
+  useAttempts,
+  type TestAttempt,
+} from '@/data/mockTestAttempts';
 
 const TEACHER_ID = 'U003';
+const TEACHER_NAME = 'Lê Hoàng Cường';
 
 const TeacherGrading = () => {
   const [subs, setSubs] = useState<Submission[]>(mockSubmissions);
   const [selected, setSelected] = useState<Submission | null>(null);
   const [score, setScore] = useState('');
   const [feedback, setFeedback] = useState('');
+
+  const attempts = useAttempts();
+  const [grading, setGrading] = useState<TestAttempt | null>(null);
 
   const myAssigned = useMemo(
     () => subs.filter((s) => s.assignedTeacherId === TEACHER_ID && ['Assigned', 'Grading', 'Returned'].includes(s.status)),
@@ -26,6 +38,15 @@ const TeacherGrading = () => {
   const myDone = useMemo(
     () => subs.filter((s) => s.assignedTeacherId === TEACHER_ID && ['PendingApproval', 'Approved'].includes(s.status)),
     [subs]
+  );
+
+  const testInbox = useMemo(
+    () => attempts.filter((a) => a.status === 'Grading' || (a.status === 'Returned' && a.gradedBy === TEACHER_NAME)),
+    [attempts],
+  );
+  const testDone = useMemo(
+    () => attempts.filter((a) => (a.status === 'PendingApproval' || a.status === 'Approved') && a.gradedBy === TEACHER_NAME),
+    [attempts],
   );
 
   const openGrade = (s: Submission) => {
@@ -112,7 +133,7 @@ const TeacherGrading = () => {
     );
   }
 
-  const renderTable = (list: Submission[], emptyText: string, showAction: boolean) => (
+  const renderHomeworkTable = (list: Submission[], emptyText: string, showAction: boolean) => (
     <Card className="border-border/60 mt-4">
       <CardContent className="p-0">
         <Table>
@@ -149,16 +170,80 @@ const TeacherGrading = () => {
     </Card>
   );
 
+  const renderTestTable = (list: TestAttempt[], emptyText: string, showAction: boolean) => (
+    <Card className="border-border/60 mt-4">
+      <CardContent className="p-0">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead>Học viên</TableHead>
+              <TableHead>Đề</TableHead>
+              <TableHead className="hidden md:table-cell">Nộp lúc</TableHead>
+              <TableHead>L auto</TableHead>
+              <TableHead>R auto</TableHead>
+              <TableHead>Trạng thái</TableHead>
+              <TableHead className="text-right">{showAction ? 'Chấm' : 'Band'}</TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {list.map((at) => (
+              <TableRow key={at.id}>
+                <TableCell className="font-medium">{at.studentName}</TableCell>
+                <TableCell className="text-sm">{at.testId}</TableCell>
+                <TableCell className="hidden md:table-cell text-xs">{at.submittedAt ?? '—'}</TableCell>
+                <TableCell className="text-sm">{at.autoScoreListening != null ? `${at.autoScoreListening}/${at.listeningTotal}` : '—'}</TableCell>
+                <TableCell className="text-sm">{at.autoScoreReading != null ? `${at.autoScoreReading}/${at.readingTotal}` : '—'}</TableCell>
+                <TableCell><Badge variant="outline" className={attemptStatusColors[at.status]}>{attemptStatusLabels[at.status]}</Badge></TableCell>
+                <TableCell className="text-right">
+                  {showAction
+                    ? <Button size="sm" onClick={() => setGrading(at)} className="gap-1"><PenSquare className="h-3.5 w-3.5" /> Chấm</Button>
+                    : <span className="font-semibold">{at.overallBand ?? '—'}</span>}
+                </TableCell>
+              </TableRow>
+            ))}
+            {list.length === 0 && <TableRow><TableCell colSpan={7} className="text-center py-12 text-muted-foreground">{emptyText}</TableCell></TableRow>}
+          </TableBody>
+        </Table>
+      </CardContent>
+    </Card>
+  );
+
   return (
     <div className="space-y-6">
-      <Tabs defaultValue="todo">
+      <Tabs defaultValue="homework">
         <TabsList>
-          <TabsTrigger value="todo">Cần chấm ({myAssigned.length})</TabsTrigger>
-          <TabsTrigger value="done">Đã chấm ({myDone.length})</TabsTrigger>
+          <TabsTrigger value="homework" className="gap-2">
+            <FileText className="h-4 w-4" /> Bài tập về nhà ({myAssigned.length})
+          </TabsTrigger>
+          <TabsTrigger value="test" className="gap-2">
+            <Sparkles className="h-4 w-4" /> Bài thi IELTS ({testInbox.length})
+          </TabsTrigger>
         </TabsList>
-        <TabsContent value="todo">{renderTable(myAssigned, 'Hiện không có bài nào cần chấm', true)}</TabsContent>
-        <TabsContent value="done">{renderTable(myDone, 'Bạn chưa chấm bài nào', false)}</TabsContent>
+
+        <TabsContent value="homework">
+          <Tabs defaultValue="todo" className="mt-4">
+            <TabsList>
+              <TabsTrigger value="todo">Cần chấm ({myAssigned.length})</TabsTrigger>
+              <TabsTrigger value="done">Đã chấm ({myDone.length})</TabsTrigger>
+            </TabsList>
+            <TabsContent value="todo">{renderHomeworkTable(myAssigned, 'Hiện không có bài nào cần chấm', true)}</TabsContent>
+            <TabsContent value="done">{renderHomeworkTable(myDone, 'Bạn chưa chấm bài nào', false)}</TabsContent>
+          </Tabs>
+        </TabsContent>
+
+        <TabsContent value="test">
+          <Tabs defaultValue="todo" className="mt-4">
+            <TabsList>
+              <TabsTrigger value="todo" className="gap-2"><PenSquare className="h-3.5 w-3.5" /> Cần chấm ({testInbox.length})</TabsTrigger>
+              <TabsTrigger value="done" className="gap-2"><ClipboardList className="h-3.5 w-3.5" /> Đã chấm ({testDone.length})</TabsTrigger>
+            </TabsList>
+            <TabsContent value="todo">{renderTestTable(testInbox, 'Không có bài thi nào cần chấm', true)}</TabsContent>
+            <TabsContent value="done">{renderTestTable(testDone, 'Bạn chưa chấm bài thi nào', false)}</TabsContent>
+          </Tabs>
+        </TabsContent>
       </Tabs>
+
+      <TestAttemptGradingDialog open={!!grading} attempt={grading} gradedBy={TEACHER_NAME} onClose={() => setGrading(null)} />
     </div>
   );
 };

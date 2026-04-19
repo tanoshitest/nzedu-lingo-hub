@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, FolderOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Trophy, Building2, BarChart3, FileEdit, FileText, Database, ClipboardCheck } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Building2, BarChart3, FileEdit, FileText, Database, ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -13,8 +13,6 @@ import CoordinatorDashboard from './views/CoordinatorDashboard';
 import CoordinatorSchedule from './views/CoordinatorSchedule';
 import CoordinatorReports from './views/CoordinatorReports';
 import TeacherSchedule from './views/TeacherSchedule';
-import TeacherReport from './views/TeacherReport';
-import TeacherMaterials from './views/TeacherMaterials';
 import StudentDashboard from './views/StudentDashboard';
 import StudentSchedule from './views/StudentSchedule';
 import StudentResults from './views/StudentResults';
@@ -29,7 +27,6 @@ import AdminCourses from './views/AdminCourses';
 import CoordinatorAdmissions from './views/CoordinatorAdmissions';
 import CoordinatorRenewals from './views/CoordinatorRenewals';
 import StudentTuition from './views/StudentTuition';
-import TeacherMonthlyResults from './views/TeacherMonthlyResults';
 import TeacherPayroll from './views/TeacherPayroll';
 import CoordinatorOffice from './views/CoordinatorOffice';
 import AdminReports from './views/AdminReports';
@@ -38,7 +35,6 @@ import AdminQuestionBank from './views/AdminQuestionBank';
 import TeacherIeltsTests from './views/TeacherIeltsTests';
 import CoordinatorIeltsTests from './views/CoordinatorIeltsTests';
 import CoordinatorTestAssignments from './views/CoordinatorTestAssignments';
-import TeacherTestGrading from './views/TeacherTestGrading';
 import StudentTests from './views/StudentTests';
 import StudentMyCourse from './views/StudentMyCourse';
 import TeacherMyCourse from './views/TeacherMyCourse';
@@ -79,11 +75,7 @@ const menus: Record<Role, MenuItem[]> = {
   Teacher: [
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
     { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
-    { key: 'report', label: 'Báo cáo lớp học', icon: BookOpen },
     { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
-    { key: 'test-assign', label: 'Giao & Chấm bài thi', icon: ClipboardCheck },
-    { key: 'monthly', label: 'Kết quả định kỳ', icon: Trophy },
-    { key: 'materials', label: 'Tài liệu', icon: FolderOpen },
     { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
     { key: 'payroll', label: 'Bảng công', icon: Wallet },
     { key: 'ielts', label: 'Đề thi IELTS', icon: FileText },
@@ -135,14 +127,10 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Coordinator-ielts': <CoordinatorIeltsTests />,
     'Coordinator-test-assign': <CoordinatorTestAssignments />,
     'Teacher-schedule': <TeacherSchedule />,
-    'Teacher-report': <TeacherReport />,
     'Teacher-grading': <TeacherGrading />,
-    'Teacher-monthly': <TeacherMonthlyResults />,
-    'Teacher-materials': <TeacherMaterials />,
     'Teacher-tasks': <TeacherTasks />,
     'Teacher-payroll': <TeacherPayroll />,
     'Teacher-ielts': <TeacherIeltsTests />,
-    'Teacher-test-assign': <TeacherTestGrading />,
     'Teacher-my-course': <TeacherMyCourse />,
     'Student-dashboard': <StudentDashboard />,
     'Student-my-course': <StudentMyCourse />,

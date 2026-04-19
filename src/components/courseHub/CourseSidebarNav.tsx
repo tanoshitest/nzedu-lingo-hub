@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 export type CourseTabKey =
   | 'overview' | 'syllabus' | 'schedule' | 'attendance' | 'progress'
   | 'assignments' | 'vocabulary' | 'exercises' | 'samples' | 'aimock' | 'roadmap'
-  | 'test-history' | 'final-test' | 'yearbook' | 'certification' | 'feedback'
+  | 'monthly' | 'test-history' | 'final-test' | 'yearbook' | 'certification' | 'feedback'
   | 'course-info' | 'extra-class';
 
 export interface NavItem { key: CourseTabKey; label: string; icon: any; hint?: string }
@@ -35,6 +35,7 @@ export const COURSE_NAV: NavGroup[] = [
   {
     label: 'THỐNG KÊ KHOÁ',
     items: [
+      { key: 'monthly', label: 'Kết quả định kỳ', icon: Award, hint: 'Điểm thi tháng' },
       { key: 'test-history', label: 'Lịch sử bài test', icon: History },
       { key: 'final-test', label: 'Final Test', icon: Trophy },
       { key: 'yearbook', label: 'Kỷ yếu', icon: Camera },

@@ -16,6 +16,7 @@ import ExercisesTab from './tabs/ExercisesTab';
 import SampleWSTab from './tabs/SampleWSTab';
 import AiMockTestTab from './tabs/AiMockTestTab';
 import RoadmapTab from './tabs/RoadmapTab';
+import MonthlyResultsTab from './tabs/MonthlyResultsTab';
 import TestHistoryTab from './tabs/TestHistoryTab';
 import FinalTestTab from './tabs/FinalTestTab';
 import YearbookTab from './tabs/YearbookTab';
@@ -53,6 +54,7 @@ const CourseDetailLayout = ({ course, role, studentId, className, teacherName, o
       case 'samples': return <SampleWSTab {...ctx} />;
       case 'aimock': return <AiMockTestTab {...ctx} />;
       case 'roadmap': return <RoadmapTab {...ctx} />;
+      case 'monthly': return <MonthlyResultsTab {...ctx} />;
       case 'test-history': return <TestHistoryTab {...ctx} />;
       case 'final-test': return <FinalTestTab {...ctx} />;
       case 'yearbook': return <YearbookTab {...ctx} />;

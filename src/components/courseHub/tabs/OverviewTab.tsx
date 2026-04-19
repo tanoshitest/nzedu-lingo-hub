@@ -6,9 +6,11 @@ import { Calendar, Clock, MapPin, TrendingUp, Target, BookOpen, Award } from 'lu
 import { classSessions } from '@/data/mockData';
 import { attendanceRecords } from '@/data/mockReports';
 import { submissions } from '@/data/mockGrading';
+import { reportStore, useClassReports, reportStatusColors, reportStatusLabels } from '@/data/mockClassReports';
 import type { TabContext } from '../shared/TabContext';
 
 const OverviewTab = ({ course, role, studentId, className, teacherName }: TabContext) => {
+  useClassReports(); // subscribe
   // Attendance KPI
   const scoped = attendanceRecords.filter((a) =>
     (!className || a.className === className) &&
@@ -99,25 +101,62 @@ const OverviewTab = ({ course, role, studentId, className, teacherName }: TabCon
       </div>
 
       {/* Pending */}
-      <Card className="border-border/60">
-        <CardHeader><CardTitle className="text-base">Bài tập cần nộp ({pending.length})</CardTitle></CardHeader>
-        <CardContent className="space-y-2">
-          {pending.slice(0, 4).map((t) => (
-            <div key={t.id} className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition">
-              <div className="h-9 w-9 rounded-lg bg-warning/10 text-warning flex items-center justify-center flex-shrink-0">
-                <BookOpen className="h-4 w-4" />
+      {role === 'Student' ? (
+        <Card className="border-border/60">
+          <CardHeader><CardTitle className="text-base">Bài tập cần nộp ({pending.length})</CardTitle></CardHeader>
+          <CardContent className="space-y-2">
+            {pending.slice(0, 4).map((t) => (
+              <div key={t.id} className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition">
+                <div className="h-9 w-9 rounded-lg bg-warning/10 text-warning flex items-center justify-center flex-shrink-0">
+                  <BookOpen className="h-4 w-4" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm">{t.lessonTitle}</div>
+                  <div className="text-xs text-muted-foreground mt-0.5">{t.fileName}</div>
+                  <div className="text-xs text-destructive mt-1 font-medium">Hạn: {t.gradingDeadline ?? '—'}</div>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm">{t.lessonTitle}</div>
-                <div className="text-xs text-muted-foreground mt-0.5">{t.fileName}</div>
-                <div className="text-xs text-destructive mt-1 font-medium">Hạn: {t.gradingDeadline ?? '—'}</div>
-              </div>
-            </div>
-          ))}
-          {pending.length === 0 && <div className="text-sm text-muted-foreground text-center py-6">Không có bài tập nào cần nộp 🎉</div>}
-          {pending.length > 4 && <Button variant="outline" className="w-full" size="sm">Xem tất cả</Button>}
-        </CardContent>
-      </Card>
+            ))}
+            {pending.length === 0 && <div className="text-sm text-muted-foreground text-center py-6">Không có bài tập nào cần nộp 🎉</div>}
+            {pending.length > 4 && <Button variant="outline" className="w-full" size="sm">Xem tất cả</Button>}
+          </CardContent>
+        </Card>
+      ) : (
+        (() => {
+          const syllabusSessions = course.syllabus?.sessions ?? [];
+          const needsReport = syllabusSessions
+            .map((s) => ({ session: s, report: className ? reportStore.findBySession(course.code, className, s.order) : undefined }))
+            .filter(({ report }) => !report || report.status === 'Draft' || report.status === 'Returned')
+            .slice(0, 5);
+          return (
+            <Card className="border-border/60">
+              <CardHeader>
+                <CardTitle className="text-base flex items-center justify-between">
+                  <span>Báo cáo lớp học cần làm ({needsReport.length})</span>
+                  <Badge variant="outline" className="bg-warning/10 text-warning border-warning/20">Chuyển đến tab Syllabus → Report</Badge>
+                </CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {needsReport.length === 0 && <div className="text-sm text-muted-foreground text-center py-6">Tất cả buổi đã có báo cáo 🎉</div>}
+                {needsReport.map(({ session, report }) => (
+                  <div key={session.id} className="flex items-start gap-3 p-3 rounded-lg border border-border hover:bg-muted/30 transition">
+                    <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center flex-shrink-0 font-bold text-sm">
+                      B{session.order}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm truncate">{session.title}</div>
+                      <div className="text-xs text-muted-foreground mt-0.5">Tuần {session.weekNumber} • {session.durationMinutes}'</div>
+                    </div>
+                    <Badge variant="outline" className={report ? reportStatusColors[report.status] : 'bg-muted text-muted-foreground border-border'}>
+                      {report ? reportStatusLabels[report.status] : 'Chưa có'}
+                    </Badge>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          );
+        })()
+      )}
     </div>
   );
 };

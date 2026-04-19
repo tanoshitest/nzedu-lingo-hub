@@ -304,7 +304,7 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
           </div>
 
           <div className="border-t border-border mt-10 pt-6 text-center text-sm text-muted-foreground">
-            © 2026 NZedu LMS. Hệ thống quản lý trung tâm Anh ngữ. Mọi quyền được bảo lưu.
+            © 2026 NZedu LMS. Prototype owned by Tanoshi Vietnam
           </div>
         </div>
       </footer>

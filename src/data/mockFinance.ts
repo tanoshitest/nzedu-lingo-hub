@@ -43,6 +43,9 @@ export const invoices: Invoice[] = [
 ];
 
 // ====== Courses ======
+import type { CourseSyllabus } from './mockSyllabus';
+import { sampleSyllabusFoundation, sampleSyllabusIntensive } from './mockSyllabus';
+
 export interface Lesson { id: string; order: number; title: string }
 export interface Course {
   id: string;
@@ -51,11 +54,13 @@ export interface Course {
   tuition: number;
   sessions: number;
   lessons: Lesson[];
+  syllabus?: CourseSyllabus;
 }
 
 export const courses: Course[] = [
   {
     id: 'C-IELTS01', code: 'IELTS01', name: 'IELTS Foundation 5.5', tuition: 8500000, sessions: 30,
+    syllabus: sampleSyllabusFoundation,
     lessons: [
       { id: 'L01', order: 1, title: 'Lesson 1 - Introduction & Diagnostic Test' },
       { id: 'L02', order: 2, title: 'Lesson 2 - Listening Part 1-2' },
@@ -71,6 +76,7 @@ export const courses: Course[] = [
   },
   {
     id: 'C-IELTS02', code: 'IELTS02', name: 'IELTS Intensive 6.5', tuition: 9500000, sessions: 30,
+    syllabus: sampleSyllabusIntensive,
     lessons: [
       { id: 'L01', order: 1, title: 'Lesson 1 - Advanced Vocabulary' },
       { id: 'L02', order: 2, title: 'Lesson 2 - Listening Section 3-4' },

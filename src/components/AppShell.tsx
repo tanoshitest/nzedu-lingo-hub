@@ -59,7 +59,6 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'courses', label: 'Thiết kế khoá học', icon: Library },
     { key: 'ielts', label: 'Thiết kế đề thi', icon: FileEdit },
     { key: 'bank', label: 'Ngân hàng câu hỏi', icon: Database },
-    { key: 'finance', label: 'Phê duyệt tài chính', icon: Wallet },
     { key: 'reports', label: 'Báo cáo', icon: BarChart3 },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],

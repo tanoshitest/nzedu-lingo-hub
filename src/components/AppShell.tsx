@@ -79,7 +79,6 @@ const menus: Record<Role, MenuItem[]> = {
   Student: [
     { key: 'dashboard', label: 'Bảng điều khiển', icon: GanttChart },
     { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
-    { key: 'schedule', label: 'Lịch học', icon: Calendar },
     { key: 'tuition', label: 'Học phí & Gia hạn', icon: Receipt },
   ],
 };

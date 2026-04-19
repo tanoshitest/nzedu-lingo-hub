@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, GanttChart, Award, ClipboardList, PenSquare, Inbox, Upload, Wallet, Library, UserPlus, RefreshCw, Receipt, Building2, BarChart3, FileEdit, FileText, Database, ClipboardCheck } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, GanttChart, ClipboardList, PenSquare, Inbox, Wallet, Library, UserPlus, RefreshCw, Receipt, Building2, BarChart3, FileEdit, FileText, Database, ClipboardCheck } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -15,11 +15,9 @@ import CoordinatorReports from './views/CoordinatorReports';
 import TeacherSchedule from './views/TeacherSchedule';
 import StudentDashboard from './views/StudentDashboard';
 import StudentSchedule from './views/StudentSchedule';
-import StudentResults from './views/StudentResults';
 import AdminTasks from './views/AdminTasks';
 import CoordinatorTasks from './views/CoordinatorTasks';
 import TeacherTasks from './views/TeacherTasks';
-import StudentSubmissions from './views/StudentSubmissions';
 import CoordinatorGrading from './views/CoordinatorGrading';
 import TeacherGrading from './views/TeacherGrading';
 import AdminFinance from './views/AdminFinance';
@@ -35,7 +33,6 @@ import AdminQuestionBank from './views/AdminQuestionBank';
 import TeacherIeltsTests from './views/TeacherIeltsTests';
 import CoordinatorIeltsTests from './views/CoordinatorIeltsTests';
 import CoordinatorTestAssignments from './views/CoordinatorTestAssignments';
-import StudentTests from './views/StudentTests';
 import StudentMyCourse from './views/StudentMyCourse';
 import TeacherMyCourse from './views/TeacherMyCourse';
 
@@ -84,9 +81,6 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'dashboard', label: 'Bảng điều khiển', icon: GanttChart },
     { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
     { key: 'schedule', label: 'Lịch học', icon: Calendar },
-    { key: 'submissions', label: 'Bài tập & Nộp bài', icon: Upload },
-    { key: 'tests', label: 'Bài thi IELTS', icon: FileText },
-    { key: 'results', label: 'Kết quả học tập', icon: Award },
     { key: 'tuition', label: 'Học phí & Gia hạn', icon: Receipt },
   ],
 };
@@ -135,9 +129,6 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Student-dashboard': <StudentDashboard />,
     'Student-my-course': <StudentMyCourse />,
     'Student-schedule': <StudentSchedule />,
-    'Student-submissions': <StudentSubmissions />,
-    'Student-tests': <StudentTests />,
-    'Student-results': <StudentResults />,
     'Student-tuition': <StudentTuition />,
   };
 

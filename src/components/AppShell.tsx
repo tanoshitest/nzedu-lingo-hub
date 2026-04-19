@@ -60,18 +60,13 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],
   Coordinator: [
-    { key: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'admissions', label: 'Tuyển sinh', icon: UserPlus },
     { key: 'schedule', label: 'Quản lý lịch học', icon: Calendar },
     { key: 'classes', label: 'Lớp học & Điểm danh', icon: BookOpen },
-    { key: 'attendance', label: 'Điểm danh', icon: ClipboardCheck },
-    { key: 'reports', label: 'Duyệt báo cáo', icon: FileCheck },
     { key: 'grading', label: 'Điều phối chấm bài', icon: Inbox },
-    { key: 'test-assign', label: 'Giao & Duyệt bài thi', icon: ClipboardCheck },
     { key: 'renewals', label: 'Gia hạn & Công nợ', icon: RefreshCw },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
     { key: 'office', label: 'Công tác văn phòng', icon: Building2 },
-    { key: 'ielts', label: 'Đề thi IELTS', icon: FileText },
   ],
   Teacher: [
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },

@@ -27,7 +27,7 @@ import FeedbackTab from './tabs/FeedbackTab';
 import CourseInfoTab from './tabs/CourseInfoTab';
 import ExtraClassTab from './tabs/ExtraClassTab';
 
-export type CourseRole = 'Student' | 'Teacher';
+export type CourseRole = 'Student' | 'Teacher' | 'Coordinator';
 
 interface Props {
   course: Course;
@@ -114,7 +114,7 @@ const CourseDetailLayout = ({ course, role, studentId, className, teacherName, o
                 <div className="ml-3 pl-4 border-l border-border/60 space-y-0.5 py-1 max-h-[50vh] overflow-y-auto">
                   {sessions.map((s) => {
                     const isActiveSession = s.order === selectedSessionOrder;
-                    const report = role === 'Teacher' && className
+                    const report = (role === 'Teacher' || role === 'Coordinator') && className
                       ? reportStore.findBySession(course.code, className, s.order)
                       : undefined;
                     return (
@@ -131,7 +131,7 @@ const CourseDetailLayout = ({ course, role, studentId, className, teacherName, o
                         <ChevronRight className={cn('h-3 w-3 flex-shrink-0 transition-transform', isActiveSession && 'rotate-90 text-primary')} />
                         <span className="font-mono text-[10px] flex-shrink-0">B{s.order}</span>
                         <span className="flex-1 min-w-0 truncate">{s.title}</span>
-                        {role === 'Teacher' && (
+                        {(role === 'Teacher' || role === 'Coordinator') && (
                           <span
                             className={cn(
                               'h-1.5 w-1.5 rounded-full flex-shrink-0',

@@ -34,6 +34,7 @@ import TeacherIeltsTests from './views/TeacherIeltsTests';
 import CoordinatorIeltsTests from './views/CoordinatorIeltsTests';
 import CoordinatorTestAssignments from './views/CoordinatorTestAssignments';
 import CoordinatorAttendance from './views/CoordinatorAttendance';
+import CoordinatorMyCourse from './views/CoordinatorMyCourse';
 import StudentMyCourse from './views/StudentMyCourse';
 import TeacherMyCourse from './views/TeacherMyCourse';
 
@@ -62,6 +63,7 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'admissions', label: 'Tuyển sinh', icon: UserPlus },
     { key: 'schedule', label: 'Quản lý lịch học', icon: Calendar },
+    { key: 'classes', label: 'Lớp học & Điểm danh', icon: BookOpen },
     { key: 'attendance', label: 'Điểm danh', icon: ClipboardCheck },
     { key: 'reports', label: 'Duyệt báo cáo', icon: FileCheck },
     { key: 'grading', label: 'Điều phối chấm bài', icon: Inbox },
@@ -115,6 +117,7 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Coordinator-dashboard': <CoordinatorDashboard />,
     'Coordinator-admissions': <CoordinatorAdmissions />,
     'Coordinator-schedule': <CoordinatorSchedule />,
+    'Coordinator-classes': <CoordinatorMyCourse />,
     'Coordinator-attendance': <CoordinatorAttendance />,
     'Coordinator-reports': <CoordinatorReports />,
     'Coordinator-grading': <CoordinatorGrading />,

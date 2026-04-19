@@ -1,6 +1,6 @@
 import type { Course } from '@/data/mockFinance';
 
-export type CourseRole = 'Student' | 'Teacher';
+export type CourseRole = 'Student' | 'Teacher' | 'Coordinator';
 
 export interface TabContext {
   course: Course;

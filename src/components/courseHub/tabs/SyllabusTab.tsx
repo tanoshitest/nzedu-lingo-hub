@@ -5,8 +5,9 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { BookOpen, FileText, Sparkles, ChevronRight, Circle, CheckCircle2, CircleDashed, Clock, Download, Link as LinkIcon } from 'lucide-react';
 import { exerciseScores, sampleDocuments, exerciseStatusLabels, exerciseStatusColors, sampleStatusLabels, sampleStatusColors, skillColors } from '@/data/mockCourseHub';
 import { testAttempts, testAssignments } from '@/data/mockTestAttempts';
-import { useClassReports } from '@/data/mockClassReports';
+import { useClassReports, reportStore } from '@/data/mockClassReports';
 import SessionReportForm from '../SessionReportForm';
+import SessionAttendanceForm from '../SessionAttendanceForm';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import type { TabContext } from '../shared/TabContext';
@@ -67,14 +68,14 @@ const SyllabusTab = ({ course, role, studentId, className, teacherName, selected
         </div>
       </div>
 
-      <h3 className="font-display text-lg font-bold">{role === 'Teacher' ? 'In-Class & Report' : 'In-Class & Homework'}</h3>
+      <h3 className="font-display text-lg font-bold">{role === 'Teacher' ? 'In-Class & Report' : role === 'Coordinator' ? 'In-Class & Điểm danh' : 'In-Class & Homework'}</h3>
 
       <Tabs defaultValue="inclass" className="w-full">
         <TabsList>
           <TabsTrigger value="inclass">In-Class</TabsTrigger>
-          {role === 'Student'
-            ? <TabsTrigger value="homework">Homework</TabsTrigger>
-            : <TabsTrigger value="report">Report</TabsTrigger>}
+          {role === 'Student' && <TabsTrigger value="homework">Homework</TabsTrigger>}
+          {role === 'Teacher' && <TabsTrigger value="report">Report</TabsTrigger>}
+          {role === 'Coordinator' && <TabsTrigger value="attendance">Điểm danh</TabsTrigger>}
           <TabsTrigger value="materials">Tài liệu</TabsTrigger>
         </TabsList>
 
@@ -195,6 +196,20 @@ const SyllabusTab = ({ course, role, studentId, className, teacherName, selected
               teacherName={teacherName}
             />
           )}
+        </TabsContent>
+
+        <TabsContent value="attendance" className="mt-4">
+          {role === 'Coordinator' && className && (() => {
+            const existingReport = reportStore.findBySession(course.code, className, session.order);
+            const sessionDate = existingReport?.sessionDate ?? `B${session.order}-${course.code}`;
+            return (
+              <SessionAttendanceForm
+                className={className}
+                sessionDate={sessionDate}
+                sessionLabel={`Buổi ${session.order} — ${session.title}`}
+              />
+            );
+          })()}
         </TabsContent>
 
         <TabsContent value="materials" className="mt-4">

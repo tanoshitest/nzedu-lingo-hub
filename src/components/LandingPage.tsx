@@ -32,7 +32,7 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero shadow-glow">
               <GraduationCap className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-display text-xl font-bold">NZedu LMS</span>
+            <span className="font-display text-xl font-bold">NZEDU LMS</span>
           </div>
 
           <DropdownMenu>
@@ -52,6 +52,9 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onLogin('Teacher')} className="cursor-pointer">
                 Đăng nhập Giáo viên
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => onLogin('PART_TIME_TEACHER')} className="cursor-pointer">
+                Đăng nhập Giáo viên Part-time
               </DropdownMenuItem>
               <DropdownMenuItem onClick={() => onLogin('Student')} className="cursor-pointer">
                 Đăng nhập Học viên
@@ -102,6 +105,7 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
                     <DropdownMenuItem onClick={() => onLogin('Admin')}>Quản trị viên</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onLogin('Coordinator')}>Giáo vụ</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onLogin('Teacher')}>Giáo viên</DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => onLogin('PART_TIME_TEACHER')}>Giáo viên Part-time</DropdownMenuItem>
                     <DropdownMenuItem onClick={() => onLogin('Student')}>Học viên</DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -246,7 +250,7 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
                 <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero shadow-glow">
                   <GraduationCap className="h-5 w-5 text-primary-foreground" />
                 </div>
-                <span className="font-display text-xl font-bold">NZedu LMS</span>
+                <span className="font-display text-xl font-bold">NZEDU LMS</span>
               </div>
               <p className="text-sm text-muted-foreground mb-4">
                 Hệ sinh thái học tập tiếng Anh toàn diện cho mọi lứa tuổi.
@@ -304,7 +308,7 @@ const LandingPage = ({ onLogin }: LandingPageProps) => {
           </div>
 
           <div className="border-t border-border mt-10 pt-6 text-center text-sm text-muted-foreground">
-            © 2026 NZedu LMS. Prototype owned by Tanoshi Vietnam
+            © 2026 NZEDU LMS. Prototype owned by Tanoshi Vietnam
           </div>
         </div>
       </footer>

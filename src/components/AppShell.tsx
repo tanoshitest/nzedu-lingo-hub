@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { GraduationCap, LogOut, Menu, X, LayoutDashboard, Users, Calendar, FileCheck, BookOpen, GanttChart, ClipboardList, PenSquare, Inbox, Wallet, Library, UserPlus, RefreshCw, Receipt, Building2, BarChart3, FileEdit, FileText, Database, ClipboardCheck } from 'lucide-react';
+import { GraduationCap, LogOut, Menu, LayoutDashboard, Users, Calendar, BookOpen, ClipboardList, PenSquare, Inbox, GanttChart, Receipt, Library, BarChart3, FileEdit, Database, ClipboardCheck, ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
@@ -18,15 +18,8 @@ import StudentSchedule from './views/StudentSchedule';
 import AdminTasks from './views/AdminTasks';
 import CoordinatorTasks from './views/CoordinatorTasks';
 import TeacherTasks from './views/TeacherTasks';
-import CoordinatorGrading from './views/CoordinatorGrading';
-import TeacherGrading from './views/TeacherGrading';
-import AdminFinance from './views/AdminFinance';
 import AdminCourses from './views/AdminCourses';
-import CoordinatorAdmissions from './views/CoordinatorAdmissions';
-import CoordinatorRenewals from './views/CoordinatorRenewals';
-import StudentTuition from './views/StudentTuition';
-import TeacherPayroll from './views/TeacherPayroll';
-import CoordinatorOffice from './views/CoordinatorOffice';
+import AdminFinance from './views/AdminFinance';
 import AdminReports from './views/AdminReports';
 import AdminIeltsTests from './views/AdminIeltsTests';
 import AdminQuestionBank from './views/AdminQuestionBank';
@@ -37,6 +30,15 @@ import CoordinatorAttendance from './views/CoordinatorAttendance';
 import CoordinatorMyCourse from './views/CoordinatorMyCourse';
 import StudentMyCourse from './views/StudentMyCourse';
 import TeacherMyCourse from './views/TeacherMyCourse';
+import SyllabusManagementView from './views/SyllabusManagementView';
+import ClassProgressView from './views/ClassProgressView';
+import TeacherGrading from './views/TeacherGrading';
+import CoordinatorGrading from './views/CoordinatorGrading';
+import CoordinatorAdmissions from './views/CoordinatorAdmissions';
+import CoordinatorRenewals from './views/CoordinatorRenewals';
+import StudentTuition from './views/StudentTuition';
+import TeacherPayroll from './views/TeacherPayroll';
+import CoordinatorOffice from './views/CoordinatorOffice';
 
 interface AppShellProps {
   role: Role;
@@ -51,31 +53,35 @@ interface MenuItem {
 
 const menus: Record<Role, MenuItem[]> = {
   Admin: [
-    { key: 'dashboard', label: 'Tổng quan', icon: LayoutDashboard },
     { key: 'users', label: 'Quản lý người dùng', icon: Users },
-    { key: 'courses', label: 'Thiết kế khoá học', icon: Library },
     { key: 'ielts', label: 'Thiết kế đề thi', icon: FileEdit },
     { key: 'bank', label: 'Ngân hàng câu hỏi', icon: Database },
     { key: 'reports', label: 'Báo cáo', icon: BarChart3 },
+    { key: 'syllabus-matrix', label: 'Quản lý Syllabus', icon: Library },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],
   Coordinator: [
-    { key: 'admissions', label: 'Tuyển sinh', icon: UserPlus },
-    { key: 'schedule', label: 'Quản lý lịch học', icon: Calendar },
-    { key: 'classes', label: 'Lớp học & Điểm danh', icon: BookOpen },
+    { key: 'users', label: 'Quản lý người dùng', icon: Users },
     { key: 'grading', label: 'Điều phối chấm bài', icon: Inbox },
-    { key: 'renewals', label: 'Gia hạn & Công nợ', icon: RefreshCw },
+    { key: 'renewals', label: 'Gia hạn & Công nợ', icon: Receipt },
+    { key: 'syllabus-matrix', label: 'Quản lý Syllabus', icon: Library },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],
   Teacher: [
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
-    { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
+    { key: 'syllabus-matrix', label: 'Quản lý Syllabus', icon: Library },
+    { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
+    { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
+  ],
+  PART_TIME_TEACHER: [
+    { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
+    { key: 'syllabus-matrix', label: 'Quản lý Syllabus', icon: Library },
     { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
     { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
   ],
   Student: [
     { key: 'dashboard', label: 'Bảng điều khiển', icon: GanttChart },
-    { key: 'my-course', label: 'Khoá học của tôi', icon: BookOpen },
+    { key: 'syllabus-matrix', label: 'Syllabus của tôi', icon: Library },
     { key: 'tuition', label: 'Học phí & Gia hạn', icon: Receipt },
   ],
 };
@@ -85,11 +91,13 @@ const userNames: Record<Role, string> = {
   Coordinator: 'Trần Thị Bình',
   Teacher: 'Lê Hoàng Cường',
   Student: 'Hoàng Minh Đức',
+  PART_TIME_TEACHER: 'Trần Văn Dũng',
 };
 
 const AppShell = ({ role, onLogout }: AppShellProps) => {
   const [activeMenu, setActiveMenu] = useState<string>(menus[role][0].key);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
   const items = menus[role];
   const currentItem = items.find((i) => i.key === activeMenu) ?? items[0];
@@ -106,9 +114,9 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Admin-bank': <AdminQuestionBank />,
     'Admin-tasks': <AdminTasks />,
     'Coordinator-dashboard': <CoordinatorDashboard />,
+    'Coordinator-users': <AdminUsers />,
     'Coordinator-admissions': <CoordinatorAdmissions />,
     'Coordinator-schedule': <CoordinatorSchedule />,
-    'Coordinator-classes': <CoordinatorMyCourse />,
     'Coordinator-attendance': <CoordinatorAttendance />,
     'Coordinator-reports': <CoordinatorReports />,
     'Coordinator-grading': <CoordinatorGrading />,
@@ -122,11 +130,19 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Teacher-tasks': <TeacherTasks />,
     'Teacher-payroll': <TeacherPayroll />,
     'Teacher-ielts': <TeacherIeltsTests />,
-    'Teacher-my-course': <TeacherMyCourse />,
+    'Teacher-syllabus-matrix': <SyllabusManagementView userRole="Teacher" />,
+    'PART_TIME_TEACHER-schedule': <TeacherSchedule />,
+    'PART_TIME_TEACHER-grading': <TeacherGrading />,
+    'PART_TIME_TEACHER-tasks': <TeacherTasks />,
+    'PART_TIME_TEACHER-syllabus-matrix': <SyllabusManagementView userRole="PART_TIME_TEACHER" />,
     'Student-dashboard': <StudentDashboard />,
-    'Student-my-course': <StudentMyCourse />,
+    'Student-syllabus-matrix': <SyllabusManagementView userRole="Student" />,
     'Student-schedule': <StudentSchedule />,
     'Student-tuition': <StudentTuition />,
+    'Admin-syllabus-matrix': <SyllabusManagementView userRole="Admin" />,
+    'Coordinator-syllabus-matrix': <SyllabusManagementView userRole="Coordinator" />,
+    'Coordinator-class-progress': <ClassProgressView userRole="COORDINATOR" />,
+    'Teacher-class-progress': <ClassProgressView userRole="PART_TIME_TEACHER" />,
   };
 
   const renderView = () => {
@@ -146,21 +162,41 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
   };
 
   const SidebarContent = ({ onItemClick }: { onItemClick?: () => void }) => (
-    <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground">
-      <div className="flex h-16 items-center gap-2 border-b border-sidebar-border px-6">
-        <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
-          <GraduationCap className="h-5 w-5 text-primary-foreground" />
+    <div className="flex h-full w-full flex-col bg-sidebar text-sidebar-foreground transition-all duration-300">
+      <div className={cn(
+        "flex h-16 items-center border-b border-sidebar-border px-6 transition-all duration-300 relative",
+        sidebarCollapsed ? "justify-center px-0" : "justify-between"
+      )}>
+        <div className="flex items-center gap-2 overflow-hidden">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero shrink-0">
+            <GraduationCap className="h-5 w-5 text-primary-foreground" />
+          </div>
+          {!sidebarCollapsed && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+              <div className="font-display font-bold text-sidebar-primary-foreground">NZEDU LMS</div>
+              <div className="text-xs text-sidebar-foreground/70">{roleLabels[role]}</div>
+            </motion.div>
+          )}
         </div>
-        <div>
-          <div className="font-display font-bold text-sidebar-primary-foreground">NZedu LMS</div>
-          <div className="text-xs text-sidebar-foreground/70">{roleLabels[role]}</div>
-        </div>
+        
+        {/* Toggle Button inside Sidebar */}
+        <button 
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className={cn(
+            "p-1.5 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-all",
+            sidebarCollapsed ? "absolute -right-4 top-6 bg-sidebar border border-sidebar-border shadow-md z-50 rounded-full" : ""
+          )}
+        >
+          {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+        </button>
       </div>
 
       <nav className="flex-1 space-y-1 p-4">
-        <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
-          Menu chính
-        </div>
+        {!sidebarCollapsed && (
+          <div className="px-3 pb-2 text-xs font-semibold uppercase tracking-wider text-sidebar-foreground/50">
+            Menu chính
+          </div>
+        )}
         {items.map((item) => {
           const Icon = item.icon;
           const active = item.key === activeMenu;
@@ -172,74 +208,81 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
                 onItemClick?.();
               }}
               className={cn(
-                'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all',
+                'group flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all relative',
                 active
                   ? 'bg-sidebar-primary text-sidebar-primary-foreground shadow-md'
-                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
+                  : 'text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                sidebarCollapsed && "justify-center px-0"
               )}
             >
-              <Icon className={cn('h-4 w-4 transition-transform', active && 'scale-110')} />
-              <span>{item.label}</span>
+              <Icon className={cn('h-4 w-4 transition-transform shrink-0', active && 'scale-110')} />
+              {!sidebarCollapsed && <span>{item.label}</span>}
+              {active && sidebarCollapsed && (
+                 <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-l-full" />
+              )}
             </button>
           );
         })}
       </nav>
 
+      <div className={cn(
+        "p-4 border-t border-sidebar-border transition-all duration-300",
+        sidebarCollapsed ? "flex justify-center px-0" : ""
+      )}>
+        {!sidebarCollapsed ? (
+          <>
+            <div className="flex items-center gap-3 mb-4 px-2">
+              <Avatar className="h-8 w-8">
+                <AvatarFallback className="gradient-hero text-primary-foreground text-xs">{initials}</AvatarFallback>
+              </Avatar>
+              <div className="text-xs">
+                <div className="font-medium text-sidebar-primary-foreground">{userName}</div>
+                <div className="text-sidebar-foreground/50">{roleLabels[role]}</div>
+              </div>
+            </div>
+            <Button variant="ghost" size="sm" onClick={onLogout} className="w-full justify-start gap-2 text-sidebar-foreground/60 hover:text-sidebar-primary-foreground">
+              <LogOut className="h-4 w-4" />
+              Đăng xuất
+            </Button>
+          </>
+        ) : (
+          <Avatar className="h-8 w-8">
+            <AvatarFallback className="gradient-hero text-primary-foreground text-[10px] font-black">{initials}</AvatarFallback>
+          </Avatar>
+        )}
+      </div>
     </div>
   );
 
   return (
-    <div className="flex min-h-screen w-full bg-background">
+    <div className="flex min-h-screen w-full bg-background overflow-hidden">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 flex-shrink-0 border-r border-sidebar-border fixed inset-y-0 left-0 z-30">
+      <aside className={cn(
+        "hidden lg:flex flex-shrink-0 border-r border-sidebar-border fixed inset-y-0 left-0 z-30 transition-all duration-300",
+        sidebarCollapsed ? "w-20" : "w-64"
+      )}>
         <SidebarContent />
       </aside>
-      <div className="hidden lg:block w-64 flex-shrink-0" aria-hidden="true" />
+      
+      {/* Spacer for fixed sidebar */}
+      <div className={cn(
+        "hidden lg:block transition-all duration-300",
+        sidebarCollapsed ? "w-20" : "w-64"
+      )} aria-hidden="true" />
 
       {/* Main */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Header */}
-        <header className="sticky top-0 z-40 flex h-16 items-center gap-4 border-b border-border bg-card/80 backdrop-blur-md px-4 md:px-6">
-          {/* Mobile menu */}
-          <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
-            <SheetTrigger asChild>
-              <Button variant="ghost" size="icon" className="lg:hidden">
-                <Menu className="h-5 w-5" />
-              </Button>
-            </SheetTrigger>
-            <SheetContent side="left" className="p-0 w-64 bg-sidebar border-sidebar-border">
-              <SidebarContent onItemClick={() => setMobileOpen(false)} />
-            </SheetContent>
-          </Sheet>
-
-          <div className="flex-1 min-w-0">
-            <h1 className="font-display text-lg md:text-xl font-bold truncate">{currentItem.label}</h1>
-            <p className="text-xs text-muted-foreground hidden sm:block">
-              Chào mừng trở lại, {userName.split(' ').slice(-1)[0]}
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-3 rounded-full border border-border bg-background px-3 py-1.5">
-              <Avatar className="h-7 w-7">
-                <AvatarFallback className="gradient-hero text-primary-foreground text-xs">
-                  {initials}
-                </AvatarFallback>
-              </Avatar>
-              <div className="text-xs">
-                <div className="font-medium leading-tight">{userName}</div>
-                <div className="text-muted-foreground leading-tight">{roleLabels[role]}</div>
-              </div>
+      <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
+        {/* Global Header - Hidden for Syllabus to allow custom header */}
+        {activeMenu !== 'syllabus-matrix' && (
+          <header className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-card/80 backdrop-blur-md px-4 md:px-6">
+            <div className="flex-1 min-w-0">
+              {/* Header Title if needed */}
             </div>
-            <Button variant="outline" size="sm" onClick={onLogout} className="gap-2">
-              <LogOut className="h-4 w-4" />
-              <span className="hidden sm:inline">Đăng xuất</span>
-            </Button>
-          </div>
-        </header>
-
+          </header>
+        )}
+        
         {/* Content */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8 overflow-x-hidden">
+        <main className="flex-1 overflow-hidden bg-[#FDFDFD] relative">
           <AnimatePresence mode="wait">{renderView()}</AnimatePresence>
         </main>
       </div>

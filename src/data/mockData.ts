@@ -1,4 +1,4 @@
-export type Role = 'Admin' | 'Coordinator' | 'Teacher' | 'Student';
+export type Role = 'Admin' | 'Coordinator' | 'Teacher' | 'Student' | 'PART_TIME_TEACHER';
 
 export interface User {
   id: string;
@@ -92,4 +92,5 @@ export const roleLabels: Record<Role, string> = {
   Coordinator: 'Giáo vụ',
   Teacher: 'Giáo viên',
   Student: 'Học viên',
+  PART_TIME_TEACHER: 'Giáo viên Part-time',
 };

@@ -103,7 +103,7 @@ const AdminUsers = () => {
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Thêm người dùng mới</DialogTitle>
-              <DialogDescription>Tạo tài khoản mới cho hệ thống NZedu LMS</DialogDescription>
+              <DialogDescription>Tạo tài khoản mới cho hệ thống NZEDU LMS</DialogDescription>
             </DialogHeader>
             <div className="space-y-4 py-2">
               <div className="space-y-2">

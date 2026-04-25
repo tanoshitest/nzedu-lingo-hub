@@ -282,7 +282,7 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
         )}
         
         {/* Content */}
-        <main className="flex-1 overflow-hidden bg-[#FDFDFD] relative">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[#FDFDFD] relative">
           <AnimatePresence mode="wait">{renderView()}</AnimatePresence>
         </main>
       </div>

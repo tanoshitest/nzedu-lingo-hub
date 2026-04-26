@@ -13,9 +13,16 @@ import {
   ArrowLeft,
   Monitor,
   FileText as FileIcon,
-  Lock
+  Lock,
+  ArrowRight
 } from 'lucide-react';
+import { mockExercises, mockExerciseResults, type Exercise, type ExerciseResult } from '../../data/mockExercises';
+import { ExercisePlayer } from '../player/ExercisePlayer';
+import { ExerciseReview } from '../player/ExerciseReview';
+import { ExercisePreview } from '../player/ExercisePreview';
+import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import { Card, CardContent } from '../ui/card';
 import { ScrollArea } from '../ui/scroll-area';
 import { 
   Accordion, 
@@ -29,6 +36,7 @@ interface SyllabusDetailedViewProps {
   activeLessonId: string;
   onLessonChange: (id: string) => void;
   userRole?: string;
+  className?: string;
 }
 
 // Mock assigned lessons for Part-time teacher demo
@@ -37,10 +45,15 @@ const assignedLessonIds = ['nk1-1', 'nk1-3', 'nk1-5', 'nk2-2', 'nk2-4'];
 export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({ 
   activeLessonId, 
   onLessonChange,
-  userRole = 'Admin'
+  userRole = 'Admin',
+  className
 }) => {
   const isStudent = userRole === 'Student';
   const [activeTab, setActiveTab] = useState<string>(isStudent ? 'in-class' : 'materials');
+  const [activeExercise, setActiveExercise] = useState<Exercise | null>(null);
+  const [viewingResult, setViewingResult] = useState<ExerciseResult | null>(null);
+  const [showingExerciseList, setShowingExerciseList] = useState(false);
+  const [previewingExercise, setPreviewingExercise] = useState<Exercise | null>(null);
   
   const activeLesson = phaseLessons.find(l => l.id === activeLessonId) || phaseLessons[0];
   const activePhase = phases.find(p => p.id === activeLesson.phaseId);
@@ -50,8 +63,8 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
   // Define tabs based on role
   const allTabs = [
     { id: 'materials', label: 'Teaching material' },
-    { id: 'outcome', label: 'Lesson outcome' },
     { id: 'in-class', label: 'In class' },
+    { id: 'outcome', label: 'Lesson outcome' },
     { id: 'after-class', label: 'After class' },
   ];
 
@@ -67,9 +80,16 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
           <div className="flex flex-col min-h-full">
             {/* Sticky Left Header */}
             <div className="sticky top-0 z-20 bg-[#FDFDFD]/95 backdrop-blur-md px-7 py-4 border-b border-slate-50 mb-2">
-               <div className="flex items-center gap-2 text-[12px] font-black text-blue-600 uppercase tracking-widest">
-                  <BookOpen className="w-4 h-4" /> SYLLABUS
-                </div>
+               <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-[12px] font-black text-blue-600 uppercase tracking-widest">
+                    <BookOpen className="w-4 h-4" /> SYLLABUS
+                  </div>
+                  {className && (
+                    <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-100 text-[10px] font-bold">
+                      {className}
+                    </Badge>
+                  )}
+               </div>
             </div>
             
             <div className="p-4 pt-0 flex-1">
@@ -87,7 +107,7 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                           "text-[11px] font-black uppercase tracking-widest transition-colors",
                           phase.id === activePhase?.id ? "text-blue-600" : "text-slate-400 group-hover:text-blue-500"
                         )}>
-                          CHẶNG {phase.id.replace('NK', '')}
+                          UNIT {phase.id.replace('NK', '')}
                         </span>
                         <span className="text-[13px] font-bold text-slate-700 truncate max-w-[200px]">
                           {phase.label.split(' - ')[1] || phase.label}
@@ -103,7 +123,7 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                                   <AccordionTrigger className="py-2 text-[10px] font-black text-blue-500/70 hover:text-blue-600 uppercase tracking-widest hover:no-underline">
                                      <div className="flex items-center gap-2">
                                         <div className="w-1 h-1 rounded-full bg-blue-500"></div>
-                                        Mục tiêu chặng
+                                        Mục tiêu Unit
                                      </div>
                                   </AccordionTrigger>
                                   <AccordionContent className="pt-1 pb-3">
@@ -154,7 +174,7 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                                     "text-xs font-bold truncate leading-tight",
                                     isTest ? "text-red-600/80" : ""
                                   )}>
-                                    {isTest ? lesson.topicName : `B${lesson.lessonNumber}  ${lesson.topicName.split(': ')[1] || lesson.topicName}`}
+                                    {isTest ? lesson.topicName : `Day ${lesson.lessonNumber}  ${lesson.topicName.split(': ')[1] || lesson.topicName}`}
                                   </span>
                                 </div>
                                 {isLocked && (
@@ -176,7 +196,18 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                 </div>
                 <div className="space-y-1">
                   {['Assignment', 'Vocabulary', 'Exercises', 'Finaltest'].map((item) => (
-                    <button key={item} className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-slate-500 hover:bg-slate-50 transition-all group">
+                    <button 
+                      key={item} 
+                      onClick={() => {
+                        if (item === 'Exercises') {
+                          setShowingExerciseList(true);
+                        }
+                      }}
+                      className={cn(
+                        "w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all group",
+                        showingExerciseList && item === 'Exercises' ? "bg-blue-50 text-blue-600" : "text-slate-500 hover:bg-slate-50"
+                      )}
+                    >
                       <span className="text-[11px] font-bold uppercase tracking-tight opacity-70 group-hover:opacity-100">{item}</span>
                       <ChevronRight className="w-3.5 h-3.5 opacity-0 group-hover:opacity-40 transition-all" />
                     </button>
@@ -190,8 +221,116 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
 
       {/* CỘT PHẢI: LESSON DETAILS */}
       <main className="flex-1 flex flex-col min-w-0 bg-white">
-        <ScrollArea className="flex-1">
-          {activeLesson.type === 'test' ? (
+        {previewingExercise ? (
+          <ScrollArea className="flex-1">
+            <ExercisePreview 
+              exercise={previewingExercise} 
+              onBack={() => setPreviewingExercise(null)} 
+            />
+          </ScrollArea>
+        ) : activeExercise ? (
+          <ScrollArea className="flex-1 bg-slate-50/30">
+             <ExercisePlayer 
+                exercise={activeExercise} 
+                onSubmit={(ans) => {
+                  // Giả lập lưu kết quả
+                  const res: ExerciseResult = {
+                    studentId: 'U005',
+                    exerciseId: activeExercise.id,
+                    score: 100, // Mock score logic
+                    answers: activeExercise.questions.map(q => ({
+                      questionId: q.id,
+                      studentAnswer: ans[q.id],
+                      isCorrect: ans[q.id] === q.correctAnswer
+                    })),
+                    submittedAt: new Date().toLocaleString('vi-VN')
+                  };
+                  setViewingResult(res);
+                  setActiveExercise(null);
+                }}
+                onCancel={() => setActiveExercise(null)}
+             />
+          </ScrollArea>
+        ) : viewingResult ? (
+          <ScrollArea className="flex-1">
+            <ExerciseReview 
+              exercise={mockExercises.find(e => e.id === viewingResult.exerciseId) || mockExercises[0]} 
+              result={viewingResult} 
+              onBack={() => setViewingResult(null)} 
+            />
+          </ScrollArea>
+        ) : showingExerciseList ? (
+          <ScrollArea className="flex-1">
+            <div className="p-8 max-w-4xl mx-auto space-y-8">
+              <div className="flex justify-between items-center">
+                 <div>
+                    <h1 className="text-3xl font-black text-slate-900 tracking-tight">Danh sách bài tập</h1>
+                    <p className="text-slate-500 mt-1">Hoàn thành bài tập để củng cố kiến thức Day {activeLesson.lessonNumber}</p>
+                 </div>
+                 <Button variant="ghost" onClick={() => setShowingExerciseList(false)} className="gap-2">
+                   <ArrowLeft size={16} /> Quay lại
+                 </Button>
+              </div>
+
+              <div className="grid grid-cols-1 gap-4">
+                 {mockExercises.filter(e => e.lessonId === activeLessonId).map((ex) => {
+                    const result = mockExerciseResults.find(r => r.exerciseId === ex.id);
+                    return (
+                      <Card key={ex.id} className="border-none shadow-md hover:shadow-xl transition-all duration-300 group overflow-hidden">
+                         <CardContent className="p-0">
+                            <div className="flex flex-col md:flex-row items-stretch">
+                               <div className="p-6 flex-1">
+                                  <div className="flex items-center gap-3 mb-2">
+                                     <Badge className="bg-indigo-50 text-indigo-600 border-indigo-100 font-bold">{ex.questions.length} câu hỏi</Badge>
+                                     {result && (
+                                       <Badge className={cn(
+                                         "font-bold border-none",
+                                         result.status === 'graded' ? "bg-emerald-100 text-emerald-700" : "bg-orange-100 text-orange-700"
+                                       )}>
+                                         {result.status === 'graded' ? 'Đã chấm' : 'Chờ chấm'}
+                                       </Badge>
+                                     )}
+                                  </div>
+                                  <h3 className="text-xl font-bold text-slate-900 mb-1">{ex.title}</h3>
+                                  <p className="text-sm text-slate-500">{ex.description}</p>
+                               </div>
+                               <div className="bg-slate-50 p-6 flex flex-col justify-center items-center gap-2 md:w-48 group-hover:bg-blue-50 transition-colors">
+                                  {userRole === 'Admin' ? (
+                                    <Button size="sm" variant="outline" className="w-full text-xs font-bold gap-1 border-blue-200 text-blue-600 hover:bg-blue-600 hover:text-white transition-all" onClick={() => setPreviewingExercise(ex)}>
+                                       Xem chi tiết <ChevronRight size={14} />
+                                    </Button>
+                                  ) : result ? (
+                                    <>
+                                       <div className="text-2xl font-black text-emerald-600">{result.score}%</div>
+                                       <Button size="sm" variant="outline" className="w-full text-xs font-bold" onClick={() => setViewingResult(result)}>
+                                          Xem kết quả
+                                       </Button>
+                                    </>
+                                  ) : (
+                                    <Button size="sm" className="w-full bg-blue-600 hover:bg-blue-700 text-xs font-bold gap-1" onClick={() => setActiveExercise(ex)}>
+                                       Làm bài ngay <ArrowRight size={14} />
+                                    </Button>
+                                  )}
+                               </div>
+                            </div>
+                         </CardContent>
+                      </Card>
+                    );
+                 })}
+                 {mockExercises.filter(e => e.lessonId === activeLessonId).length === 0 && (
+                   <div className="py-20 text-center">
+                      <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-300">
+                        <Monitor size={40} />
+                      </div>
+                      <h3 className="text-slate-400 font-bold uppercase tracking-widest text-sm">Chưa có bài tập cho Day này</h3>
+                   </div>
+                 )}
+              </div>
+            </div>
+          </ScrollArea>
+        ) : (
+          <ScrollArea className="flex-1">
+            {activeLesson.type === 'test' ? (
             <div className="flex flex-col items-center justify-center min-h-[600px] text-center space-y-4">
               <div className="w-24 h-24 rounded-[40px] bg-slate-50 flex items-center justify-center mb-4">
                 <Monitor className="w-12 h-12 text-slate-200" />
@@ -246,7 +385,7 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                               </div>
                               <div>
                                 <h4 className="font-bold text-slate-800">File pptx bài giảng</h4>
-                                <p className="text-xs text-slate-400">Slide bài giảng Buổi {activeLesson.lessonNumber} - {activeLesson.topicName}</p>
+                                <p className="text-xs text-slate-400">Slide bài giảng Day {activeLesson.lessonNumber} - {activeLesson.topicName}</p>
                               </div>
                             </div>
                             <Button variant="ghost" className="text-blue-600 font-bold text-xs gap-2 group-hover:bg-blue-50">
@@ -261,7 +400,7 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                               </div>
                               <div>
                                 <h4 className="font-bold text-slate-800">Bài quiz kiểm tra</h4>
-                                <p className="text-xs text-slate-400">Quiz kiểm tra từ vựng buổi {activeLesson.lessonNumber}</p>
+                                <p className="text-xs text-slate-400">Quiz kiểm tra từ vựng Day {activeLesson.lessonNumber}</p>
                               </div>
                             </div>
                             <Button variant="ghost" className="text-blue-600 font-bold text-xs gap-2 group-hover:bg-blue-50">
@@ -296,6 +435,38 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                               </div>
                             </div>
                             <BookOpen className="w-8 h-8 text-slate-200" />
+                          </div>
+
+                          {/* Hướng dẫn giảng dạy section */}
+                          <div className="space-y-4">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                              <ClipboardCheck className="w-4 h-4 text-indigo-500" /> Hướng dẫn giảng dạy (Teacher's Guide)
+                            </h3>
+                            <div className="p-6 rounded-3xl bg-indigo-50/30 border border-indigo-100/50 shadow-sm shadow-indigo-100/20">
+                              <div className="space-y-4">
+                                <div className="flex items-start gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">1</div>
+                                  <div>
+                                    <h5 className="text-sm font-black text-indigo-900">Warm-up & Review</h5>
+                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Chào hỏi học sinh, ôn tập các từ vựng của buổi học trước bằng game nhanh hoặc bài hát.</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">2</div>
+                                  <div>
+                                    <h5 className="text-sm font-black text-indigo-900">Presentation</h5>
+                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Giới thiệu chủ đề hôm nay: {activeLesson.topicName}. Sử dụng Flashcards hoặc slide để trình bày từ vựng mới.</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">3</div>
+                                  <div>
+                                    <h5 className="text-sm font-black text-indigo-900">Practice & Activity</h5>
+                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Học sinh làm việc nhóm, thực hành cấu trúc câu. Giáo viên quan sát và sửa phát âm cho từng bé.</p>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
                           </div>
 
                           <div className="space-y-4">
@@ -405,7 +576,8 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
             </div>
           )}
         </ScrollArea>
-      </main>
+      )}
+    </main>
     </div>
   );
 };

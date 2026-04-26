@@ -39,6 +39,12 @@ import CoordinatorRenewals from './views/CoordinatorRenewals';
 import StudentTuition from './views/StudentTuition';
 import TeacherPayroll from './views/TeacherPayroll';
 import CoordinatorOffice from './views/CoordinatorOffice';
+import { GradingCoordinationView } from './views/GradingCoordinationView';
+import { StudentSubmissionView } from './views/StudentSubmissionView';
+import { PendingGradingView } from './views/PendingGradingView';
+import { ClassManagementView } from './views/ClassManagementView';
+import { MyClassesView } from './views/MyClassesView';
+import { SyllabusDetailedView } from './syllabus/SyllabusDetailedView';
 
 interface AppShellProps {
   role: Role;
@@ -53,6 +59,7 @@ interface MenuItem {
 
 const menus: Record<Role, MenuItem[]> = {
   Admin: [
+    { key: 'classes', label: 'Quản lý lớp học', icon: LayoutDashboard },
     { key: 'users', label: 'Quản lý người dùng', icon: Users },
     { key: 'ielts', label: 'Thiết kế đề thi', icon: FileEdit },
     { key: 'bank', label: 'Ngân hàng câu hỏi', icon: Database },
@@ -61,27 +68,29 @@ const menus: Record<Role, MenuItem[]> = {
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],
   Coordinator: [
-    { key: 'users', label: 'Quản lý người dùng', icon: Users },
+    { key: 'classes', label: 'Quản lý lớp học', icon: LayoutDashboard },
     { key: 'grading', label: 'Điều phối chấm bài', icon: Inbox },
     { key: 'renewals', label: 'Gia hạn & Công nợ', icon: Receipt },
     { key: 'syllabus-matrix', label: 'Quản lý Syllabus', icon: Library },
     { key: 'tasks', label: 'Quản lý công việc', icon: ClipboardList },
   ],
   Teacher: [
+    { key: 'my-classes', label: 'Lớp của tôi', icon: LayoutDashboard },
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
-    { key: 'syllabus-matrix', label: 'Quản lý Syllabus', icon: Library },
     { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
     { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
   ],
   PART_TIME_TEACHER: [
+    { key: 'my-classes', label: 'Lớp của tôi', icon: LayoutDashboard },
     { key: 'schedule', label: 'Lịch dạy', icon: Calendar },
-    { key: 'syllabus-matrix', label: 'Quản lý Syllabus', icon: Library },
     { key: 'grading', label: 'Khu vực chấm bài', icon: PenSquare },
     { key: 'tasks', label: 'Công việc & Yêu cầu', icon: ClipboardList },
   ],
   Student: [
     { key: 'dashboard', label: 'Bảng điều khiển', icon: GanttChart },
     { key: 'syllabus-matrix', label: 'Syllabus của tôi', icon: Library },
+    { key: 'submission', label: 'Nộp bài tập', icon: PenSquare },
+    { key: 'pending-grading', label: 'Trạng thái bài chấm', icon: ClipboardCheck },
     { key: 'tuition', label: 'Học phí & Gia hạn', icon: Receipt },
   ],
 };
@@ -96,6 +105,8 @@ const userNames: Record<Role, string> = {
 
 const AppShell = ({ role, onLogout }: AppShellProps) => {
   const [activeMenu, setActiveMenu] = useState<string>(menus[role][0].key);
+  const [selectedClass, setSelectedClass] = useState<{ syllabusId: string; className: string } | null>(null);
+  const [activeLessonId, setActiveLessonId] = useState('nk1-1');
   const [mobileOpen, setMobileOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
@@ -113,30 +124,46 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
     'Admin-ielts': <AdminIeltsTests />,
     'Admin-bank': <AdminQuestionBank />,
     'Admin-tasks': <AdminTasks />,
+    'Admin-grading': <GradingCoordinationView />,
     'Coordinator-dashboard': <CoordinatorDashboard />,
     'Coordinator-users': <AdminUsers />,
     'Coordinator-admissions': <CoordinatorAdmissions />,
     'Coordinator-schedule': <CoordinatorSchedule />,
     'Coordinator-attendance': <CoordinatorAttendance />,
     'Coordinator-reports': <CoordinatorReports />,
-    'Coordinator-grading': <CoordinatorGrading />,
+    'Admin-classes': <ClassManagementView />,
+    'Coordinator-classes': <ClassManagementView />,
+    'Teacher-my-classes': <MyClassesView teacherId="U003" onSelectClass={(sid, name) => {
+      setSelectedClass({ syllabusId: sid, className: name });
+      setActiveMenu('class-syllabus');
+    }} />,
+    'PART_TIME_TEACHER-my-classes': <MyClassesView teacherId="U003" onSelectClass={(sid, name) => {
+      setSelectedClass({ syllabusId: sid, className: name });
+      setActiveMenu('class-syllabus');
+    }} />,
+    'Coordinator-grading': <GradingCoordinationView />,
     'Coordinator-renewals': <CoordinatorRenewals />,
     'Coordinator-tasks': <CoordinatorTasks />,
-    'Coordinator-office': <CoordinatorOffice />,
-    'Coordinator-ielts': <CoordinatorIeltsTests />,
-    'Coordinator-test-assign': <CoordinatorTestAssignments />,
     'Teacher-schedule': <TeacherSchedule />,
-    'Teacher-grading': <TeacherGrading />,
+    'Teacher-grading': <PendingGradingView />,
     'Teacher-tasks': <TeacherTasks />,
     'Teacher-payroll': <TeacherPayroll />,
     'Teacher-ielts': <TeacherIeltsTests />,
     'Teacher-syllabus-matrix': <SyllabusManagementView userRole="Teacher" />,
     'PART_TIME_TEACHER-schedule': <TeacherSchedule />,
-    'PART_TIME_TEACHER-grading': <TeacherGrading />,
+    'PART_TIME_TEACHER-grading': <PendingGradingView />,
     'PART_TIME_TEACHER-tasks': <TeacherTasks />,
     'PART_TIME_TEACHER-syllabus-matrix': <SyllabusManagementView userRole="PART_TIME_TEACHER" />,
     'Student-dashboard': <StudentDashboard />,
+    'Student-submission': <StudentSubmissionView />,
+    'Student-pending-grading': <PendingGradingView />,
     'Student-syllabus-matrix': <SyllabusManagementView userRole="Student" />,
+    'class-syllabus': <SyllabusDetailedView 
+      activeLessonId={activeLessonId} 
+      onLessonChange={setActiveLessonId} 
+      userRole={role}
+      className={selectedClass?.className}
+    />,
     'Student-schedule': <StudentSchedule />,
     'Student-tuition': <StudentTuition />,
     'Admin-syllabus-matrix': <SyllabusManagementView userRole="Admin" />,

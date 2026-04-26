@@ -206,11 +206,11 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
           )}
         </div>
         
-        {/* Toggle Button inside Sidebar */}
+        {/* Toggle Button inside Sidebar - Only for Desktop */}
         <button 
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
           className={cn(
-            "p-1.5 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-all",
+            "hidden lg:flex p-1.5 rounded-lg hover:bg-sidebar-accent text-sidebar-foreground/50 hover:text-sidebar-foreground transition-all",
             sidebarCollapsed ? "absolute -right-4 top-6 bg-sidebar border border-sidebar-border shadow-md z-50 rounded-full" : ""
           )}
         >
@@ -243,8 +243,8 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
               )}
             >
               <Icon className={cn('h-4 w-4 transition-transform shrink-0', active && 'scale-110')} />
-              {!sidebarCollapsed && <span>{item.label}</span>}
-              {active && sidebarCollapsed && (
+              {(!sidebarCollapsed || onItemClick) && <span>{item.label}</span>}
+              {active && sidebarCollapsed && !onItemClick && (
                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-blue-500 rounded-l-full" />
               )}
             </button>
@@ -254,9 +254,9 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
 
       <div className={cn(
         "p-4 border-t border-sidebar-border transition-all duration-300",
-        sidebarCollapsed ? "flex justify-center px-0" : ""
+        (sidebarCollapsed && !onItemClick) ? "flex justify-center px-0" : ""
       )}>
-        {!sidebarCollapsed ? (
+        {(!sidebarCollapsed || onItemClick) ? (
           <>
             <div className="flex items-center gap-3 mb-4 px-2">
               <Avatar className="h-8 w-8">
@@ -283,6 +283,26 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
 
   return (
     <div className="flex min-h-screen w-full bg-background overflow-hidden">
+      {/* Mobile Nav Trigger & Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-50 flex h-16 items-center justify-between border-b border-border bg-card/80 backdrop-blur-md px-4">
+        <div className="flex items-center gap-2">
+          <div className="flex h-9 w-9 items-center justify-center rounded-lg gradient-hero">
+            <GraduationCap className="h-5 w-5 text-primary-foreground" />
+          </div>
+          <div className="font-display font-bold text-sidebar-foreground">NZEDU LMS</div>
+        </div>
+        <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+          <SheetTrigger asChild>
+            <Button variant="ghost" size="icon" className="lg:hidden">
+              <Menu className="h-6 w-6" />
+            </Button>
+          </SheetTrigger>
+          <SheetContent side="left" className="p-0 w-72">
+            <SidebarContent onItemClick={() => setMobileOpen(false)} />
+          </SheetContent>
+        </Sheet>
+      </div>
+
       {/* Desktop Sidebar */}
       <aside className={cn(
         "hidden lg:flex flex-shrink-0 border-r border-sidebar-border fixed inset-y-0 left-0 z-30 transition-all duration-300",
@@ -297,21 +317,45 @@ const AppShell = ({ role, onLogout }: AppShellProps) => {
         sidebarCollapsed ? "w-20" : "w-64"
       )} aria-hidden="true" />
 
-      {/* Main */}
+      {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
-        {/* Global Header - Hidden for Syllabus to allow custom header */}
-        {activeMenu !== 'syllabus-matrix' && (
-          <header className="sticky top-0 z-40 flex h-16 items-center border-b border-border bg-card/80 backdrop-blur-md px-4 md:px-6">
-            <div className="flex-1 min-w-0">
-              {/* Header Title if needed */}
-            </div>
-          </header>
-        )}
-        
+        {/* Mobile Header Spacer */}
+        <div className="lg:hidden h-16 shrink-0" />
+
         {/* Content */}
-        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[#FDFDFD] relative">
+        <main className="flex-1 overflow-y-auto overflow-x-hidden bg-[#FDFDFD] relative pb-20 lg:pb-0">
           <AnimatePresence mode="wait">{renderView()}</AnimatePresence>
         </main>
+
+        {/* Mobile Bottom Tab Bar */}
+        <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50 flex h-16 items-center justify-around border-t border-border bg-card/80 backdrop-blur-md px-2">
+          {items.slice(0, 4).map((item) => {
+            const Icon = item.icon;
+            const active = item.key === activeMenu;
+            return (
+              <button
+                key={item.key}
+                onClick={() => setActiveMenu(item.key)}
+                className={cn(
+                  "flex flex-col items-center gap-1 transition-all duration-200",
+                  active ? "text-primary scale-110" : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                <Icon className="h-5 w-5" />
+                <span className="text-[10px] font-medium truncate max-w-[60px]">
+                  {item.label.split(' ').pop()}
+                </span>
+              </button>
+            );
+          })}
+          <button
+            onClick={() => setMobileOpen(true)}
+            className="flex flex-col items-center gap-1 text-muted-foreground hover:text-foreground transition-all"
+          >
+            <Menu className="h-5 w-5" />
+            <span className="text-[10px] font-medium">Menu</span>
+          </button>
+        </div>
       </div>
     </div>
   );

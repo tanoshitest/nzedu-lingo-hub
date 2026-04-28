@@ -49,7 +49,7 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
   className
 }) => {
   const isStudent = userRole === 'Student';
-  const [activeTab, setActiveTab] = useState<string>(isStudent ? 'in-class' : 'materials');
+  const [activeTab, setActiveTab] = useState<string>('in-class');
   const [activeExercise, setActiveExercise] = useState<Exercise | null>(null);
   const [viewingResult, setViewingResult] = useState<ExerciseResult | null>(null);
   const [showingExerciseList, setShowingExerciseList] = useState(false);
@@ -62,10 +62,9 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
 
   // Define tabs based on role
   const allTabs = [
-    { id: 'materials', label: 'Teaching material' },
     { id: 'in-class', label: 'In class' },
-    { id: 'outcome', label: 'Lesson outcome' },
     { id: 'after-class', label: 'After class' },
+    { id: 'materials', label: 'Teaching material' },
   ];
 
   const visibleTabs = isStudent 
@@ -377,50 +376,92 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                       transition={{ duration: 0.2 }}
                     >
                       {activeTab === 'materials' && (
-                        <div className="space-y-4">
-                          <div className="flex items-center justify-between p-5 rounded-2xl border border-slate-50 bg-slate-50/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all group">
-                            <div className="flex items-center gap-5">
-                              <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <FileIcon className="w-6 h-6 text-orange-500" />
+                        <div className="space-y-8">
+                          {/* File Section */}
+                          <div className="space-y-4">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                              <FileIcon className="w-4 h-4 text-orange-500" /> File
+                            </h3>
+                            <div className="flex items-center justify-between p-5 rounded-2xl border border-slate-50 bg-slate-50/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all group">
+                              <div className="flex items-center gap-5">
+                                <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                  <FileIcon className="w-6 h-6 text-orange-500" />
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-800">File pptx bài giảng</h4>
+                                  <p className="text-xs text-slate-400">Slide bài giảng Day {activeLesson.lessonNumber} - {activeLesson.topicName}</p>
+                                </div>
                               </div>
-                              <div>
-                                <h4 className="font-bold text-slate-800">File pptx bài giảng</h4>
-                                <p className="text-xs text-slate-400">Slide bài giảng Day {activeLesson.lessonNumber} - {activeLesson.topicName}</p>
-                              </div>
+                              <Button variant="ghost" className="text-blue-600 font-bold text-xs gap-2 group-hover:bg-blue-50">
+                                Xem bài giảng <ExternalLink className="w-3.5 h-3.5" />
+                              </Button>
                             </div>
-                            <Button variant="ghost" className="text-blue-600 font-bold text-xs gap-2 group-hover:bg-blue-50">
-                              Xem bài giảng <ExternalLink className="w-3.5 h-3.5" />
-                            </Button>
+
+                            <div className="flex items-center justify-between p-5 rounded-2xl border border-slate-50 bg-slate-50/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all group">
+                              <div className="flex items-center gap-5">
+                                <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                  <Monitor className="w-6 h-6 text-blue-500" />
+                                </div>
+                                <div>
+                                  <h4 className="font-bold text-slate-800">Bài quiz kiểm tra</h4>
+                                  <p className="text-xs text-slate-400">Quiz kiểm tra từ vựng Day {activeLesson.lessonNumber}</p>
+                                </div>
+                              </div>
+                              <Button variant="ghost" className="text-blue-600 font-bold text-xs gap-2 group-hover:bg-blue-50">
+                                Làm bài Quiz <ExternalLink className="w-3.5 h-3.5" />
+                              </Button>
+                            </div>
                           </div>
 
-                          <div className="flex items-center justify-between p-5 rounded-2xl border border-slate-50 bg-slate-50/30 hover:bg-white hover:shadow-xl hover:shadow-slate-200/50 transition-all group">
-                            <div className="flex items-center gap-5">
-                              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <Monitor className="w-6 h-6 text-blue-500" />
-                              </div>
-                              <div>
-                                <h4 className="font-bold text-slate-800">Bài quiz kiểm tra</h4>
-                                <p className="text-xs text-slate-400">Quiz kiểm tra từ vựng Day {activeLesson.lessonNumber}</p>
+                          {/* Lesson Outcome Section */}
+                          <div className="space-y-4">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-blue-500" /> Lesson Outcome
+                            </h3>
+                            <div className="grid grid-cols-1 gap-3">
+                              {(activeLesson.lessonOutcome || "After lesson, Ss can: - remember 80% new words; - recognise new words; - pronounce words clearly; - answer with full sentences")
+                                .split(';').map((outcome, idx) => (
+                                  <div key={idx} className="flex items-center gap-4 p-4 rounded-xl border border-slate-50 bg-slate-50/30 hover:bg-white transition-all">
+                                    <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
+                                    <span className="text-[14px] font-bold text-slate-700 leading-tight">
+                                      {outcome.replace('- ', '').trim()}
+                                    </span>
+                                  </div>
+                                ))}
+                            </div>
+                          </div>
+
+                          {/* Lesson Plan Section */}
+                          <div className="space-y-4">
+                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                              <ClipboardCheck className="w-4 h-4 text-indigo-500" /> Lesson Plan (Hướng dẫn giảng dạy)
+                            </h3>
+                            <div className="p-6 rounded-3xl bg-indigo-50/30 border border-indigo-100/50 shadow-sm shadow-indigo-100/20">
+                              <div className="space-y-4">
+                                <div className="flex items-start gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">1</div>
+                                  <div>
+                                    <h5 className="text-sm font-black text-indigo-900">10 phút đầu (Warm-up & Review)</h5>
+                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Chào hỏi học sinh, ôn tập các từ vựng của buổi học trước bằng game nhanh hoặc bài hát.</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">2</div>
+                                  <div>
+                                    <h5 className="text-sm font-black text-indigo-900">Tiếp theo (Presentation)</h5>
+                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Giới thiệu chủ đề hôm nay: {activeLesson.topicName}. Sử dụng Flashcards hoặc slide để trình bày từ vựng mới.</p>
+                                  </div>
+                                </div>
+                                <div className="flex items-start gap-3">
+                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">3</div>
+                                  <div>
+                                    <h5 className="text-sm font-black text-indigo-900">Cuối giờ (Practice & Activity)</h5>
+                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Học sinh làm việc nhóm, thực hành cấu trúc câu. Giáo viên quan sát và sửa phát âm cho từng bé.</p>
+                                  </div>
+                                </div>
                               </div>
                             </div>
-                            <Button variant="ghost" className="text-blue-600 font-bold text-xs gap-2 group-hover:bg-blue-50">
-                              Làm bài Quiz <ExternalLink className="w-3.5 h-3.5" />
-                            </Button>
                           </div>
-                        </div>
-                      )}
-
-                      {activeTab === 'outcome' && (
-                        <div className="grid grid-cols-1 gap-3">
-                          {(activeLesson.lessonOutcome || "After lesson, Ss can: - remember 80% new words; - recognise new words; - pronounce words clearly; - answer with full sentences")
-                            .split(';').map((outcome, idx) => (
-                              <div key={idx} className="flex items-center gap-4 p-4 rounded-xl border border-slate-50 bg-slate-50/30 hover:bg-white transition-all">
-                                <CheckCircle2 className="w-5 h-5 text-blue-400 shrink-0" />
-                                <span className="text-[14px] font-bold text-slate-700 leading-tight">
-                                  {outcome.replace('- ', '').trim()}
-                                </span>
-                              </div>
-                            ))}
                         </div>
                       )}
 
@@ -435,38 +476,6 @@ export const SyllabusDetailedView: React.FC<SyllabusDetailedViewProps> = ({
                               </div>
                             </div>
                             <BookOpen className="w-8 h-8 text-slate-200" />
-                          </div>
-
-                          {/* Hướng dẫn giảng dạy section */}
-                          <div className="space-y-4">
-                            <h3 className="text-xs font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
-                              <ClipboardCheck className="w-4 h-4 text-indigo-500" /> Hướng dẫn giảng dạy (Teacher's Guide)
-                            </h3>
-                            <div className="p-6 rounded-3xl bg-indigo-50/30 border border-indigo-100/50 shadow-sm shadow-indigo-100/20">
-                              <div className="space-y-4">
-                                <div className="flex items-start gap-3">
-                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">1</div>
-                                  <div>
-                                    <h5 className="text-sm font-black text-indigo-900">Warm-up & Review</h5>
-                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Chào hỏi học sinh, ôn tập các từ vựng của buổi học trước bằng game nhanh hoặc bài hát.</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">2</div>
-                                  <div>
-                                    <h5 className="text-sm font-black text-indigo-900">Presentation</h5>
-                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Giới thiệu chủ đề hôm nay: {activeLesson.topicName}. Sử dụng Flashcards hoặc slide để trình bày từ vựng mới.</p>
-                                  </div>
-                                </div>
-                                <div className="flex items-start gap-3">
-                                  <div className="w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-[10px] font-bold shrink-0">3</div>
-                                  <div>
-                                    <h5 className="text-sm font-black text-indigo-900">Practice & Activity</h5>
-                                    <p className="text-xs text-slate-600 mt-1 leading-relaxed">Học sinh làm việc nhóm, thực hành cấu trúc câu. Giáo viên quan sát và sửa phát âm cho từng bé.</p>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
                           </div>
 
                           <div className="space-y-4">
